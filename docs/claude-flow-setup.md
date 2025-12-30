@@ -6,8 +6,7 @@
 ### 1. インストール
 
 ```bash
-npm install -D claude-flow@alpha
-npm install agentdb@1.3.9
+npm install -D claude-flow@alpha agentdb@1.3.9
 ```
 
 ### 2. 初期化（既存 .claude を保持）

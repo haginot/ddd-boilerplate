@@ -1,8 +1,7 @@
 ## Claude Flow ガイド
 
 ### 1. インストール & 初期化
-- `npm install -D claude-flow@alpha`
-- `npm install agentdb@1.3.9`
+- `npm install -D claude-flow@alpha agentdb@1.3.9`
 - `npx claude-flow@alpha init --force --preserve-claude-dir`
 - MCP 登録: `claude mcp add claude-flow "npx claude-flow@alpha mcp start"`
 

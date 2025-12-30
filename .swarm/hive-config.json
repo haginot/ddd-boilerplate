@@ -1,0 +1,28 @@
+{
+  "queenAgent": {
+    "role": "strategic-coordinator",
+    "responsibilities": ["context-mapping", "ubiquitous-language", "integration"]
+  },
+  "workerAgents": [
+    {
+      "role": "domain-expert",
+      "focus": "entities, value-objects, aggregates",
+      "namespace": "domain"
+    },
+    {
+      "role": "application-architect",
+      "focus": "use-cases, commands, queries",
+      "namespace": "application"
+    },
+    {
+      "role": "infrastructure-engineer",
+      "focus": "repositories, external-services",
+      "namespace": "infrastructure"
+    },
+    {
+      "role": "test-engineer",
+      "focus": "unit, integration, e2e tests",
+      "namespace": "architecture"
+    }
+  ]
+}

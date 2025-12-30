@@ -1,0 +1,21 @@
+{
+  "memory": {
+    "reasoningBank": {
+      "storage": ".swarm/memory.db",
+      "namespaces": ["domain", "application", "infrastructure", "interface", "architecture"]
+    },
+    "agentdb": {
+      "enabled": true,
+      "vectorSearch": {
+        "k": 5,
+        "threshold": 0.7
+      }
+    }
+  },
+  "patterns": {
+    "tactical": ".swarm/patterns/tactical",
+    "strategic": ".swarm/patterns/strategic"
+  },
+  "sessions": ".swarm/sessions",
+  "logs": ".swarm/logs"
+}
