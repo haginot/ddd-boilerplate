@@ -93,6 +93,11 @@ const config = {
       testMatch: ['<rootDir>/tests/e2e/**/*.spec.ts', '<rootDir>/tests/e2e/**/*.test.ts'],
       testEnvironment: 'node',
     },
+    {
+      displayName: 'claude-flow-integration',
+      testMatch: ['<rootDir>/tests/claude-flow-integration/**/*.spec.ts', '<rootDir>/tests/claude-flow-integration/**/*.test.ts'],
+      testEnvironment: 'node',
+    },
   ],
 };
 

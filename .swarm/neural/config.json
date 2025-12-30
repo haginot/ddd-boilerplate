@@ -1,0 +1,31 @@
+{
+  "learning": {
+    "enabled": true,
+    "triggers": {
+      "code-review-approved": "reward +1",
+      "test-passed": "reward +0.5",
+      "layer-violation": "penalty -2",
+      "pattern-reused": "reward +0.3"
+    },
+    "patterns": {
+      "track": [
+        "entity-creation",
+        "aggregate-design",
+        "value-object-definition",
+        "repository-implementation",
+        "event-publishing",
+        "factory-method"
+      ],
+      "threshold": 5
+    }
+  },
+  "suggestions": {
+    "enabled": true,
+    "minConfidence": 0.7,
+    "maxSuggestions": 3
+  },
+  "storage": {
+    "patternLibrary": ".swarm/neural/patterns.json",
+    "learningHistory": ".swarm/neural/history.json"
+  }
+}
