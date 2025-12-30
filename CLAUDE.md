@@ -506,3 +506,17 @@ Mark task as complete and move to the next.
 
 **Last Updated**: 2025-12-30
 **Version**: 2.0.0
+
+---
+
+## Docker Integration (Testing & Validation)
+
+- テスト用イメージ: `Dockerfile.test`
+- Compose: `docker-compose.test.yml`（`test-runner`, `integration-test`, `test-db`）
+- 主なコマンド:
+  - `npm run docker:build` — テストイメージをビルド
+  - `npm run docker:test` — ユニット+統合テストを Docker で実行
+  - `npm run docker:check` — lint / typecheck / dockerテスト / audit / outdated を一括実行しレポート生成
+- レポート: `reports/*.json`（`scripts/docker-problem-detector.sh` が生成）
+- 速い検証: `npm run docker:test:unit`（ドメイン・アプリ層の高速チェック用）
+- フック: `.claude/hooks/docker_test.sh`（pre_commit）、`.claude/hooks/docker_lint_and_test.sh`（PostToolUse）
