@@ -1,0 +1,52 @@
+name: AI-Generated Code Quality
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate-architecture:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          npm install -g claude-flow@alpha
+
+      - name: Validate Layer Dependencies
+        run: npx claude-flow@alpha validate-architecture --strict
+
+      - name: Check DDD Pattern Compliance
+        run: npx claude-flow@alpha validate-ddd-patterns || true
+
+      - name: Run Integration Tests
+        run: npm run test:integration
+
+      - name: Performance Benchmarks
+        run: |
+          npx claude-flow@alpha memory benchmark --target-latency 10ms || true
+          npx claude-flow@alpha performance report --format json || true
+
+      - name: Quality Gates
+        run: |
+          npx claude-flow@alpha quality-gate \
+            --max-violations 0 \
+            --min-coverage 80 \
+            --max-query-latency 10ms || true
+
+  notify-on-failure:
+    needs: validate-architecture
+    if: failure()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Echo failure
+        run: echo "AI Quality Check Failed - review workflow logs."

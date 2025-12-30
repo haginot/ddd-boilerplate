@@ -1,0 +1,31 @@
+{
+  "version": "1.0.0",
+  "claudeFlow": {
+    "memory": {
+      "defaultNamespace": "architecture",
+      "namespaces": [
+        "domain",
+        "application",
+        "infrastructure",
+        "interface",
+        "architecture"
+      ],
+      "reasoningBank": {
+        "enabled": true,
+        "storage": ".swarm/memory.db"
+      },
+      "agentdb": {
+        "enabled": true,
+        "vectorSearch": {
+          "k": 5,
+          "threshold": 0.7
+        }
+      }
+    },
+    "swarm": {
+      "patternsDir": ".swarm/patterns",
+      "sessionsDir": ".swarm/sessions",
+      "logsDir": ".swarm/logs"
+    }
+  }
+}

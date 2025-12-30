@@ -1,0 +1,29 @@
+name: DDD Architecture Review
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  architecture-review:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Claude Flow
+        run: npm install -g claude-flow@alpha
+
+      - name: Validate DDD Architecture
+        run: |
+          npx claude-flow@alpha validate-architecture --strict
+          npx claude-flow@alpha github-review \
+            --pr ${{ github.event.pull_request.number }} \
+            --checks layer-dependencies,domain-model,ubiquitous-language

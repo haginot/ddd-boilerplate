@@ -46,3 +46,8 @@ CLAUDE.local.md
 
 # Debug
 .debug/
+
+# Claude Flow / Swarm
+.swarm/
+!.swarm/config.json
+!.swarm/hive-config.json
