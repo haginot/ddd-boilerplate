@@ -17,7 +17,11 @@
     "lint:fix": "eslint src --ext .ts --fix",
     "typecheck": "tsc --noEmit",
     "validate:architecture": "node scripts/validate-architecture.js",
-    "clean": "rimraf dist"
+    "clean": "rimraf dist",
+    "test:claude-flow": "jest --selectProjects claude-flow-integration",
+    "ubiquitous-language:extract": "node scripts/extract-ubiquitous-language.js",
+    "performance:report": "node scripts/performance-report.js",
+    "performance:dashboard": "node scripts/performance-report.js --format html --output dashboard.html && open dashboard.html"
   },
   "keywords": [
     "ddd",

@@ -51,3 +51,9 @@ CLAUDE.local.md
 .swarm/
 !.swarm/config.json
 !.swarm/hive-config.json
+!.swarm/neural/config.json
+!.swarm/**/.gitkeep
+
+# Performance reports (generated)
+dashboard.html
+performance-report.json
