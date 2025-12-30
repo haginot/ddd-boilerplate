@@ -2,9 +2,7 @@
   "hooks": {
     "PreToolUse": [
       {
-        "matcher": {
-          "tools": ["Write", "Edit"]
-        },
+        "matcher": "Write|Edit",
         "hooks": [
           {
             "type": "command",
@@ -21,9 +19,7 @@
     ],
     "PostToolUse": [
       {
-        "matcher": {
-          "tools": ["Write", "Edit"]
-        },
+        "matcher": "Write|Edit",
         "hooks": [
           {
             "type": "command",
