@@ -416,5 +416,93 @@ Before committing code, verify:
 
 ---
 
-**Last Updated**: {{DATE}}
-**Version**: 1.0.0
+## Task Management with Task Master
+
+This project integrates [Task Master](https://github.com/eyaltoledano/claude-task-master) for AI-powered task management aligned with DDD principles.
+
+### Quick Start
+
+```bash
+# Initialize Task Master
+npm run task:init
+
+# Parse PRD and generate tasks
+npm run task:parse
+
+# List all tasks
+npm run task:list
+
+# Show next task to work on
+npm run task:next
+```
+
+### Task Workflow
+
+```
+┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
+│  1. PRD         │────▶│  2. Parse       │────▶│  3. Tasks       │
+│  Creation       │     │  PRD            │     │  Generated      │
+└─────────────────┘     └─────────────────┘     └─────────────────┘
+                                                        │
+                                                        ▼
+┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
+│  6. Complete    │◀────│  5. Validate    │◀────│  4. Implement   │
+│  Task           │     │  Architecture   │     │  Task           │
+└─────────────────┘     └─────────────────┘     └─────────────────┘
+```
+
+#### 1. PRD Creation
+Write your requirements in `.taskmaster/docs/prd.txt`. Use the DDD PRD template at `.taskmaster/templates/ddd-prd-template.txt` for guidance.
+
+#### 2. Task Generation
+Ask the AI: "Can you parse my PRD at .taskmaster/docs/prd.txt?"
+
+#### 3. Implementation
+Follow DDD layer order:
+1. **Domain Layer First** - Entities, Value Objects, Aggregates, Events
+2. **Application Layer** - Use Cases, Commands, Queries
+3. **Infrastructure Layer** - Repository implementations, External services
+4. **Interface Layer** - Controllers, API endpoints
+
+#### 4. Validation
+Run architecture validation before completing: `npm run validate:layers`
+
+#### 5. Completion
+Mark task as complete and move to the next.
+
+### Task-to-Layer Mapping
+
+| Layer | Task Focus | Key Guidelines |
+|-------|------------|----------------|
+| Domain | Entities, Value Objects, Aggregates, Events | NO outer layer imports, pure business logic |
+| Application | Use Cases, Commands, Queries | Orchestrate domain, handle transactions |
+| Infrastructure | Repositories, External services | Implement domain interfaces |
+| Interface | Controllers, DTOs, API endpoints | Handle HTTP, validate input |
+
+### Common Commands
+
+| Command | Description |
+|---------|-------------|
+| `npm run task:list` | List all tasks |
+| `npm run task:next` | Show next task to work on |
+| `npm run task:show -- <id>` | Show specific task |
+| `npm run task:parse` | Parse PRD and generate tasks |
+| `npm run task:complexity` | Generate complexity report |
+
+### Directory Structure
+
+```
+.taskmaster/
+├── docs/
+│   ├── prd.txt              # Main PRD file
+│   └── context-map.md       # DDD context mapping
+├── templates/
+│   ├── ddd-prd-template.txt # DDD-specific PRD template
+│   └── example_prd.txt      # Example PRD for reference
+└── tasks/                    # Generated tasks
+```
+
+---
+
+**Last Updated**: 2025-12-30
+**Version**: 2.0.0
