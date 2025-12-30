@@ -1,0 +1,51 @@
+services:
+  test-db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: testdb
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: test
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U test -d testdb"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - test-db-data:/var/lib/postgresql/data
+
+  test-runner:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    depends_on:
+      test-db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://test:test@test-db:5432/testdb
+      NODE_ENV: test
+    command: ["npm", "run", "test:unit"]
+    volumes:
+      - ./src:/app/src
+      - ./tests:/app/tests
+      - ./coverage:/app/coverage
+      - ./reports:/app/reports
+
+  integration-test:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    depends_on:
+      test-db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://test:test@test-db:5432/testdb
+      NODE_ENV: test
+    command: ["npm", "run", "test:integration"]
+    volumes:
+      - ./src:/app/src
+      - ./tests:/app/tests
+      - ./coverage:/app/coverage
+      - ./reports:/app/reports
+
+volumes:
+  test-db-data:
