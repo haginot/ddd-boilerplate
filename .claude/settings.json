@@ -2,7 +2,9 @@
   "hooks": {
     "PreToolUse": [
       {
-        "matcher": "Write|Edit",
+        "matcher": {
+          "tools": ["Write", "Edit"]
+        },
         "hooks": [
           {
             "type": "command",
@@ -19,7 +21,9 @@
     ],
     "PostToolUse": [
       {
-        "matcher": "Write|Edit",
+        "matcher": {
+          "tools": ["Write", "Edit"]
+        },
         "hooks": [
           {
             "type": "command",
@@ -32,25 +36,6 @@
             "timeout": 120
           }
         ]
-      }
-    ],
-    "on_task_status_change": [
-      {
-        "type": "command",
-        "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/task-architecture-validator.sh",
-        "timeout": 60
-      }
-    ],
-    "pre_commit": [
-      {
-        "type": "command",
-        "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/validate-layer-dependencies.sh",
-        "timeout": 30
-      },
-      {
-        "type": "command",
-        "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/task-architecture-validator.sh",
-        "timeout": 60
       }
     ]
   }
