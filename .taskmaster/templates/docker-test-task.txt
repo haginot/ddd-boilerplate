@@ -1,0 +1,21 @@
+Task: [Feature Name] - Docker Environment Validation
+
+Context:
+- Bounded Context: {context_name}
+- Layer: {layer_name}
+
+Validation Requirements:
+1. All tests pass in Docker (`npm run docker:test`)
+2. No layer dependency violations
+3. Coverage meets threshold (default 80%)
+4. npm audit reports no critical issues
+
+Validation Commands:
+- npm run docker:build
+- npm run docker:check
+
+Success Criteria:
+- [ ] `npm run docker:test` exits with code 0
+- [ ] `npm run docker:check` exits with code 0
+- [ ] Coverage report generated in `coverage/`
+- [ ] Problem detector report has 0 failed checks

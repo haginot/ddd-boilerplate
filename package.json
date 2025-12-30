@@ -29,7 +29,15 @@
     "task:next": "npx task-master next",
     "task:show": "npx task-master show",
     "task:complexity": "npx task-master complexity-report",
-    "task:expand": "npx task-master expand"
+    "task:expand": "npx task-master expand",
+    "docker:build": "docker build -f Dockerfile.test -t ddd-boilerplate-test .",
+    "docker:test": "docker-compose -f docker-compose.test.yml run --rm test-runner && docker-compose -f docker-compose.test.yml run --rm integration-test",
+    "docker:test:unit": "docker-compose -f docker-compose.test.yml run --rm test-runner",
+    "docker:test:integration": "docker-compose -f docker-compose.test.yml run --rm integration-test",
+    "docker:clean": "docker-compose -f docker-compose.test.yml down -v --remove-orphans || true",
+    "docker:check": "./scripts/docker-problem-detector.sh",
+    "report:latest": "node scripts/view-report.js",
+    "report:history": "ls -1 reports/*.json 2>/dev/null || echo 'no reports'"
   },
   "keywords": [
     "ddd",

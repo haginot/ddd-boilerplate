@@ -203,6 +203,11 @@ Description: [What this context is responsible for]
 - Application layer dispatches to external handlers
 - Use eventual consistency for cross-context communication
 
+## Docker Validation Requirements
+- Tests must pass in Docker (`npm run docker:test`)
+- Full quality checks via `npm run docker:check`
+- Docker Compose file: `docker-compose.test.yml`
+
 # ============================================
 # SECTION 6: ACCEPTANCE CRITERIA
 # ============================================
