@@ -159,6 +159,7 @@ Validation hooks automatically check:
 - **Layer Dependencies**: Prevents domain layer from importing outer layers
 - **Domain Events**: Validates event naming and structure
 - **Naming Conventions**: Ensures consistent naming patterns
+- **Task Architecture**: Validates task implementations follow DDD principles
 
 ### Skills
 
@@ -167,6 +168,54 @@ The DDD Architecture skill provides guidance for:
 - Implementing repositories
 - Publishing domain events
 - Designing bounded contexts
+
+## Task Master Integration
+
+This project integrates [Task Master](https://github.com/eyaltoledano/claude-task-master) for AI-powered task management aligned with DDD principles.
+
+### Quick Start
+
+```bash
+# Initialize Task Master
+npm run task:init
+
+# Parse PRD and generate tasks
+npm run task:parse
+
+# List all tasks
+npm run task:list
+
+# Show next task
+npm run task:next
+```
+
+### Task Management Commands
+
+| Command | Description |
+|---------|-------------|
+| `npm run task:init` | Initialize Task Master |
+| `npm run task:parse` | Parse PRD and generate tasks |
+| `npm run task:list` | List all tasks |
+| `npm run task:next` | Show next task to work on |
+| `npm run task:show -- <id>` | Show specific task(s) |
+| `npm run task:complexity` | Generate complexity report |
+| `npm run task:expand` | Expand task into subtasks |
+
+### PRD Templates
+
+DDD-specific PRD templates are available in `.taskmaster/templates/`:
+- `ddd-prd-template.txt` - Comprehensive DDD PRD template
+- `example_prd.txt` - Example PRD for Order Management bounded context
+
+### Task Workflow
+
+1. **Write PRD** - Create detailed requirements in `.taskmaster/docs/prd.txt`
+2. **Parse PRD** - Generate tasks with `npm run task:parse`
+3. **Implement** - Follow DDD layer order (Domain → Application → Infrastructure → Interface)
+4. **Validate** - Run `npm run validate:layers` before completing
+5. **Complete** - Mark task as done and move to next
+
+See `CLAUDE.md` for detailed task management documentation.
 
 ## Documentation
 

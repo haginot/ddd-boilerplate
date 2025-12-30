@@ -1,5 +1,7 @@
 {
-  "version": "1.0.0",
+  "name": "ddd-taskmaster-flow",
+  "version": "2.0.0",
+  "description": "Integrated DDD Architecture + Task Master workflow",
   "claudeFlow": {
     "memory": {
       "defaultNamespace": "architecture",
@@ -8,7 +10,8 @@
         "application",
         "infrastructure",
         "interface",
-        "architecture"
+        "architecture",
+        "tasks"
       ],
       "reasoningBank": {
         "enabled": true,
@@ -26,6 +29,59 @@
       "patternsDir": ".swarm/patterns",
       "sessionsDir": ".swarm/sessions",
       "logsDir": ".swarm/logs"
+    }
+  },
+  "triggers": {
+    "on_task_created": {
+      "description": "Triggered when a new task is created from PRD",
+      "actions": [
+        "validate_task_against_architecture",
+        "check_layer_assignment"
+      ]
+    },
+    "on_task_started": {
+      "description": "Triggered when a task status changes to in-progress",
+      "actions": [
+        "load_relevant_context"
+      ]
+    },
+    "on_task_completed": {
+      "description": "Triggered when a task is marked as completed",
+      "actions": [
+        "run_architecture_validation",
+        "run_tests"
+      ]
+    },
+    "on_prd_updated": {
+      "description": "Triggered when PRD file is modified",
+      "actions": [
+        "regenerate_tasks"
+      ]
+    }
+  },
+  "integrations": {
+    "taskmaster": {
+      "enabled": true,
+      "auto_validate": true,
+      "architecture_check": true,
+      "prd_path": ".taskmaster/docs/prd.txt",
+      "tasks_path": ".taskmaster/tasks/"
+    }
+  },
+  "workflows": {
+    "task_implementation": {
+      "description": "Standard workflow for implementing a task following DDD principles",
+      "steps": [
+        "parse_task_requirements",
+        "identify_affected_layers",
+        "implement_domain_logic",
+        "implement_application_logic",
+        "implement_infrastructure",
+        "implement_interface",
+        "validate_architecture",
+        "run_tests",
+        "update_task_status"
+      ]
     }
   }
 }
