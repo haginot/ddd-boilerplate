@@ -1,4 +1,9 @@
 {
+  "sandbox": {
+    "allowUnsandboxedCommands": false,
+    "excludedCommands": ["docker", "docker-compose"],
+    "allowUnixSockets": false
+  },
   "hooks": {
     "PreToolUse": [
       {
