@@ -169,53 +169,42 @@ The DDD Architecture skill provides guidance for:
 - Publishing domain events
 - Designing bounded contexts
 
-## Task Master Integration
+## Spec-Driven Development with spec-workflow-mcp
 
-This project integrates [Task Master](https://github.com/eyaltoledano/claude-task-master) for AI-powered task management aligned with DDD principles.
+This project integrates [spec-workflow-mcp](https://github.com/Pimzino/spec-workflow-mcp) for structured, approval-based specification workflow aligned with DDD principles.
 
 ### Quick Start
 
 ```bash
-# Initialize Task Master
-npm run task:init
+# Start the dashboard (optional)
+npm run spec:dashboard
 
-# Parse PRD and generate tasks
-npm run task:parse
-
-# List all tasks
-npm run task:list
-
-# Show next task
-npm run task:next
+# In Claude Code, use natural language:
+# - "Create a spec for user authentication feature"
+# - "List all specs"
+# - "Execute task 1.2 in spec user-auth"
 ```
 
-### Task Management Commands
+### Natural Language Commands
 
 | Command | Description |
 |---------|-------------|
-| `npm run task:init` | Initialize Task Master |
-| `npm run task:parse` | Parse PRD and generate tasks |
-| `npm run task:list` | List all tasks |
-| `npm run task:next` | Show next task to work on |
-| `npm run task:show -- <id>` | Show specific task(s) |
-| `npm run task:complexity` | Generate complexity report |
-| `npm run task:expand` | Expand task into subtasks |
+| "Create a spec for [feature]" | Create new specification |
+| "List all specs" | Show all specifications and status |
+| "Show spec [name]" | Display specification details |
+| "Execute task [id] in spec [name]" | Execute a specific task |
+| "Approve spec [name]" | Approve specification |
 
-### PRD Templates
+### Spec Workflow
 
-DDD-specific PRD templates are available in `.taskmaster/templates/`:
-- `ddd-prd-template.txt` - Comprehensive DDD PRD template
-- `example_prd.txt` - Example PRD for Order Management bounded context
+1. **Create Requirements** - Define requirements using natural language
+2. **Design Specification** - System generates structured specs with tasks by DDD layer
+3. **Approve Specification** - Review and approve before implementation
+4. **Implement** - Follow DDD layer order (Domain → Application → Infrastructure → Interface)
+5. **Validate** - Run `npm run validate:layers` before completing
+6. **Complete** - Mark spec as done after all tasks finished
 
-### Task Workflow
-
-1. **Write PRD** - Create detailed requirements in `.taskmaster/docs/prd.txt`
-2. **Parse PRD** - Generate tasks with `npm run task:parse`
-3. **Implement** - Follow DDD layer order (Domain → Application → Infrastructure → Interface)
-4. **Validate** - Run `npm run validate:layers` before completing
-5. **Complete** - Mark task as done and move to next
-
-See `CLAUDE.md` for detailed task management documentation.
+See `CLAUDE.md` for detailed spec-workflow documentation.
 
 ## Documentation
 

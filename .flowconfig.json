@@ -1,7 +1,7 @@
 {
-  "name": "ddd-taskmaster-flow",
-  "version": "2.0.0",
-  "description": "Integrated DDD Architecture + Task Master workflow",
+  "name": "ddd-spec-workflow-flow",
+  "version": "3.0.0",
+  "description": "Integrated DDD Architecture + spec-workflow-mcp workflow",
   "claudeFlow": {
     "memory": {
       "defaultNamespace": "architecture",
@@ -11,7 +11,7 @@
         "infrastructure",
         "interface",
         "architecture",
-        "tasks"
+        "specs"
       ],
       "reasoningBank": {
         "enabled": true,
@@ -32,10 +32,10 @@
     }
   },
   "triggers": {
-    "on_task_created": {
-      "description": "Triggered when a new task is created from PRD",
+    "on_spec_created": {
+      "description": "Triggered when a new specification is created",
       "actions": [
-        "validate_task_against_architecture",
+        "validate_spec_against_architecture",
         "check_layer_assignment"
       ]
     },
@@ -52,27 +52,28 @@
         "run_tests"
       ]
     },
-    "on_prd_updated": {
-      "description": "Triggered when PRD file is modified",
+    "on_spec_approved": {
+      "description": "Triggered when a specification is approved",
       "actions": [
-        "regenerate_tasks"
+        "validate_architecture",
+        "prepare_implementation"
       ]
     }
   },
   "integrations": {
-    "taskmaster": {
+    "spec-workflow": {
       "enabled": true,
       "auto_validate": true,
       "architecture_check": true,
-      "prd_path": ".taskmaster/docs/prd.txt",
-      "tasks_path": ".taskmaster/tasks/"
+      "specs_path": ".spec-workflow/specs/",
+      "approvals_path": ".spec-workflow/approvals/"
     }
   },
   "workflows": {
-    "task_implementation": {
-      "description": "Standard workflow for implementing a task following DDD principles",
+    "spec_implementation": {
+      "description": "Standard workflow for implementing a specification following DDD principles",
       "steps": [
-        "parse_task_requirements",
+        "parse_spec_requirements",
         "identify_affected_layers",
         "implement_domain_logic",
         "implement_application_logic",
@@ -80,7 +81,7 @@
         "implement_interface",
         "validate_architecture",
         "run_tests",
-        "update_task_status"
+        "update_spec_status"
       ]
     }
   }
