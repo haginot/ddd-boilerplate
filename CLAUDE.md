@@ -416,59 +416,66 @@ Before committing code, verify:
 
 ---
 
-## Task Management with Task Master
+## Spec-Driven Development with spec-workflow-mcp
 
-This project integrates [Task Master](https://github.com/eyaltoledano/claude-task-master) for AI-powered task management aligned with DDD principles.
+This project integrates [spec-workflow-mcp](https://github.com/Pimzino/spec-workflow-mcp) for structured, approval-based specification workflow aligned with DDD principles.
+
+### Overview
+
+spec-workflow-mcp provides a specification-driven development workflow:
+- **Structured Workflow**: Requirements → Design → Tasks
+- **Approval Process**: Built-in approval and revision tracking
+- **Real-time Dashboard**: Visual progress monitoring
+- **Task Progress Tracking**: Visual progress bars and detailed status
 
 ### Quick Start
 
 ```bash
-# Initialize Task Master
-npm run task:init
+# Start the dashboard (optional, for visual monitoring)
+npm run spec:dashboard
 
-# Parse PRD and generate tasks
-npm run task:parse
-
-# List all tasks
-npm run task:list
-
-# Show next task to work on
-npm run task:next
+# In Claude Code, use natural language:
+# - "Create a spec for user authentication feature"
+# - "List all specs"
+# - "Execute task 1.2 in spec user-auth"
 ```
 
-### Task Workflow
+### Spec Workflow
 
 ```
 ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
-│  1. PRD         │────▶│  2. Parse       │────▶│  3. Tasks       │
-│  Creation       │     │  PRD            │     │  Generated      │
+│  1. Create      │────▶│  2. Design      │────▶│  3. Approve     │
+│  Requirements   │     │  Specification  │     │  Spec           │
 └─────────────────┘     └─────────────────┘     └─────────────────┘
                                                         │
                                                         ▼
 ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
 │  6. Complete    │◀────│  5. Validate    │◀────│  4. Implement   │
-│  Task           │     │  Architecture   │     │  Task           │
+│  Spec           │     │  Architecture   │     │  Tasks          │
 └─────────────────┘     └─────────────────┘     └─────────────────┘
 ```
 
-#### 1. PRD Creation
-Write your requirements in `.taskmaster/docs/prd.txt`. Use the DDD PRD template at `.taskmaster/templates/ddd-prd-template.txt` for guidance.
+#### 1. Create Requirements
+Define requirements using natural language with Claude Code. The spec-workflow-mcp will generate structured specifications.
 
-#### 2. Task Generation
-Ask the AI: "Can you parse my PRD at .taskmaster/docs/prd.txt?"
+#### 2. Design Specification
+The system creates detailed design documents with tasks organized by DDD layers.
 
-#### 3. Implementation
+#### 3. Approve Specification
+Review and approve the specification before implementation. Revisions are tracked.
+
+#### 4. Implementation
 Follow DDD layer order:
 1. **Domain Layer First** - Entities, Value Objects, Aggregates, Events
 2. **Application Layer** - Use Cases, Commands, Queries
 3. **Infrastructure Layer** - Repository implementations, External services
 4. **Interface Layer** - Controllers, API endpoints
 
-#### 4. Validation
+#### 5. Validation
 Run architecture validation before completing: `npm run validate:layers`
 
-#### 5. Completion
-Mark task as complete and move to the next.
+#### 6. Complete Specification
+Mark spec as complete after all tasks are done.
 
 ### Task-to-Layer Mapping
 
@@ -479,33 +486,41 @@ Mark task as complete and move to the next.
 | Infrastructure | Repositories, External services | Implement domain interfaces |
 | Interface | Controllers, DTOs, API endpoints | Handle HTTP, validate input |
 
-### Common Commands
+### Natural Language Commands
 
 | Command | Description |
 |---------|-------------|
-| `npm run task:list` | List all tasks |
-| `npm run task:next` | Show next task to work on |
-| `npm run task:show -- <id>` | Show specific task |
-| `npm run task:parse` | Parse PRD and generate tasks |
-| `npm run task:complexity` | Generate complexity report |
+| "Create a spec for [feature]" | Create new specification |
+| "List all specs" | Show all specifications and their status |
+| "Show spec [name]" | Display specific specification details |
+| "Execute task [id] in spec [name]" | Execute a specific task |
+| "Approve spec [name]" | Approve a specification for implementation |
 
 ### Directory Structure
 
 ```
-.taskmaster/
-├── docs/
-│   ├── prd.txt              # Main PRD file
-│   └── context-map.md       # DDD context mapping
-├── templates/
-│   ├── ddd-prd-template.txt # DDD-specific PRD template
-│   └── example_prd.txt      # Example PRD for reference
-└── tasks/                    # Generated tasks
+.spec-workflow/
+├── approvals/      # Approval tracking files
+├── archive/        # Archived specifications
+├── specs/          # Active specifications
+├── steering/       # Workflow management files
+├── templates/      # Spec templates
+└── user-templates/ # Custom user templates
+```
+
+### Dashboard
+
+Access the real-time dashboard for visual progress monitoring:
+
+```bash
+npm run spec:dashboard
+# Opens at http://localhost:5000
 ```
 
 ---
 
-**Last Updated**: 2025-12-30
-**Version**: 2.0.0
+**Last Updated**: 2026-01-01
+**Version**: 3.0.0
 
 ---
 
