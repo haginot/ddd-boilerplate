@@ -1,77 +1,79 @@
-# Task Management with Task Master
+# Spec-Driven Development with spec-workflow-mcp
 
-This skill provides guidance for using Task Master to manage development tasks within a DDD/Clean Architecture project.
+This skill provides guidance for using spec-workflow-mcp to manage development specifications within a DDD/Clean Architecture project.
 
 ## Overview
 
-Task Master is an AI-powered task management system that integrates with Claude Code to provide structured, PRD-based task generation and tracking. This skill helps you use Task Master effectively while maintaining DDD principles.
+spec-workflow-mcp is a specification-driven development workflow tool that integrates with Claude Code to provide structured, approval-based task management. This skill helps you use spec-workflow-mcp effectively while maintaining DDD principles.
 
 ---
 
 ## Quick Start Commands
 
-### Initialization
+### Creating Specifications
 ```
-Initialize taskmaster-ai in my project
-```
-
-### Parsing PRD
-```
-Can you parse my PRD at .taskmaster/docs/prd.txt?
+Create a spec for user authentication feature
+Create a specification for order management bounded context
 ```
 
-### Task Navigation
+### Listing and Viewing
 ```
-What's the next task I should work on?
-Can you show me tasks 1, 3, and 5?
-Can you list all pending tasks?
-```
-
-### Task Implementation
-```
-Can you help me implement task 3?
-Can you expand task 4 into subtasks?
+List all specs
+Show spec user-auth
+What's the status of the order-management spec?
 ```
 
-### Research (with Perplexity)
+### Task Execution
 ```
-Research best practices for implementing repository pattern in TypeScript
-Research domain event handling patterns in Node.js
+Execute task 1.2 in spec user-auth
+Run the next task in order-management spec
+```
+
+### Approval Workflow
+```
+Approve spec user-auth
+Request revision for spec order-management
 ```
 
 ---
 
-## DDD-Aligned Task Workflow
+## DDD-Aligned Spec Workflow
 
-### 1. PRD Creation
-Start with a detailed PRD that follows DDD principles:
+### 1. Specification Creation
+Create specifications aligned with bounded contexts:
 
 ```
-.taskmaster/docs/prd.txt
-├── Bounded Context Definition
-├── Ubiquitous Language
-├── Functional Requirements by Layer
-│   ├── Domain Layer
-│   ├── Application Layer
-│   ├── Infrastructure Layer
-│   └── Interface Layer
-└── Architecture Constraints
+Create a spec for [bounded-context-name] with the following requirements:
+- [Domain requirement 1]
+- [Domain requirement 2]
+- [Application requirement]
+- [Infrastructure requirement]
 ```
 
-Use the template at `.taskmaster/templates/ddd-prd-template.txt` for guidance.
+### 2. Task Organization by Layer
 
-### 2. Task Generation
-Parse the PRD to generate tasks:
+Specifications should organize tasks by DDD layers:
+
 ```
-Can you parse my PRD at .taskmaster/docs/prd.txt?
+Spec: user-authentication
+├── Domain Layer Tasks (Priority: High)
+│   ├── 1.1 Create UserId Value Object
+│   ├── 1.2 Create Email Value Object
+│   ├── 1.3 Create User Aggregate
+│   └── 1.4 Define UserCreatedEvent
+├── Application Layer Tasks (Priority: Medium)
+│   ├── 2.1 Create RegisterUserCommand
+│   ├── 2.2 Create RegisterUserUseCase
+│   └── 2.3 Create AuthenticateUserUseCase
+├── Infrastructure Layer Tasks (Priority: Medium)
+│   ├── 3.1 Implement UserRepository
+│   └── 3.2 Implement PasswordHasher
+└── Interface Layer Tasks (Priority: Low)
+    ├── 4.1 Create AuthController
+    └── 4.2 Define API DTOs
 ```
 
-Task Master will create tasks organized by:
-- Priority (domain layer first, then application, infrastructure, interface)
-- Dependencies (foundational tasks before dependent ones)
-- Complexity (simple tasks can be broken down)
-
-### 3. Task Implementation Order
+### 3. Implementation Order
 
 Follow DDD layering when implementing tasks:
 
@@ -173,56 +175,64 @@ Tasks targeting the interface layer should focus on:
 
 ---
 
-## Common Task Patterns
+## Common Spec Patterns
 
-### Pattern 1: Creating a New Aggregate
+### Pattern 1: Creating a New Aggregate Spec
 
-When a task involves creating a new aggregate:
+When creating a spec for a new aggregate:
 
-1. **Create Value Objects** (if needed)
-2. **Create Entity** (if aggregate has child entities)
-3. **Create Aggregate Root**
-4. **Create Repository Interface**
-5. **Create Domain Events**
+```
+Create a spec for Order aggregate with:
+- OrderId, CustomerId value objects
+- Order aggregate root with items collection
+- OrderCreatedEvent, OrderConfirmedEvent
+- OrderRepository interface
+- CreateOrderUseCase, ConfirmOrderUseCase
+- SqlOrderRepository implementation
+- OrderController with REST endpoints
+```
 
-### Pattern 2: Implementing a Use Case
+### Pattern 2: Adding a Feature Spec
 
-When a task involves implementing a use case:
+When creating a spec for a new feature:
 
-1. **Create Command/Query**
-2. **Create Use Case**
-3. **Create Response DTO**
-4. **Wire Dependencies**
+```
+Create a spec for password reset feature:
+- PasswordResetToken value object
+- PasswordResetRequestedEvent
+- RequestPasswordResetUseCase
+- ResetPasswordUseCase
+- EmailService integration
+- PasswordResetController
+```
 
-### Pattern 3: Adding an API Endpoint
+### Pattern 3: Refactoring Spec
 
-When a task involves adding an API endpoint:
+When creating a spec for refactoring:
 
-1. **Create Request DTO**
-2. **Create Response DTO**
-3. **Add Controller Method**
-4. **Add Route**
+```
+Create a spec for extracting Payment bounded context:
+- Move payment-related entities from Order context
+- Create PaymentRepository interface
+- Update Order aggregate to use PaymentId reference
+- Implement anti-corruption layer
+```
 
 ---
 
-## Research Commands
+## Dashboard Usage
 
-Use Task Master's research feature for DDD guidance:
+Start the visual dashboard for progress monitoring:
 
-### Pattern Research
-```
-Research best practices for implementing [DDD pattern] in TypeScript
-```
-
-### Context-Aware Research
-```
-Research [topic] for our [bounded context] implementation in src/[context]/
+```bash
+npm run spec:dashboard
 ```
 
-### Latest Updates
-```
-Research latest updates on [DDD concept] with examples
-```
+The dashboard provides:
+- Real-time progress tracking
+- Visual task status
+- Approval workflow overview
+- Implementation logs
 
 ---
 
@@ -237,6 +247,6 @@ Research latest updates on [DDD concept] with examples
 
 ## Resources
 
-- [Task Master Documentation](https://docs.task-master.dev/)
-- [DDD Templates](`.taskmaster/templates/`)
-- [Example PRD](`.taskmaster/templates/example_prd.txt`)
+- [spec-workflow-mcp Documentation](https://github.com/Pimzino/spec-workflow-mcp)
+- [DDD Reference](./docs/ubiquitous-language.md)
+- [Context Map](./docs/context-map.md)
