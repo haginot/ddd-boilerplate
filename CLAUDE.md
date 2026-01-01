@@ -102,6 +102,29 @@ spec-workflow-mcp の環境が設定されていません。
 | `.spec-workflow/` がない | spec-workflow ツールを一度実行すると自動作成 |
 | npx 実行エラー | `npm install -g @pimzino/spec-workflow-mcp` でグローバルインストール |
 
+#### 5. 推奨環境変数
+
+Claude Code の動作を最適化するために、以下の環境変数を設定することを推奨します。
+
+**`~/.zshrc` または `~/.bashrc` に追加:**
+
+```bash
+# Claude Code 出力トークン制限の引き上げ
+# デフォルト: 4096 → 長い応答でエラーが発生する場合に増加
+export CLAUDE_CODE_MAX_OUTPUT_TOKENS=16384
+```
+
+**設定後の反映:**
+```bash
+source ~/.zshrc  # または source ~/.bashrc
+```
+
+| 環境変数 | デフォルト値 | 推奨値 | 説明 |
+|----------|-------------|--------|------|
+| `CLAUDE_CODE_MAX_OUTPUT_TOKENS` | 4096 | 16384 | 出力トークンの最大数。長い応答が必要な場合に増加 |
+
+**注意**: トークン数を増やすと、API コストが増加する可能性があります。
+
 ---
 
 ## Project Overview
