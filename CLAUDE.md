@@ -618,6 +618,44 @@ Before committing code, verify:
 
 - [docs/ubiquitous-language.md](./docs/ubiquitous-language.md) - Domain vocabulary
 - [docs/context-map.md](./docs/context-map.md) - Bounded context relationships
+- [docs/claude-code-github-actions.md](./docs/claude-code-github-actions.md) - GitHub Actions integration
+
+---
+
+## Claude Code GitHub Actions Integration
+
+This project includes GitHub Actions workflows for automated development with Claude Code.
+
+### Available Workflows
+
+| Workflow | Trigger | Purpose |
+|----------|---------|---------|
+| `claude-code-issue.yml` | Issue with `claude-dev` label | Auto-implement issues |
+| `claude-code-test.yml` | PR/push | Cloud testing |
+| `claude-code-review.yml` | PR | Automated code review |
+
+### Quick Start
+
+1. **Add secret:** Repository Settings → Secrets → `ANTHROPIC_API_KEY`
+
+2. **Auto-implement an issue:**
+   - Create an issue with requirements
+   - Add `claude-dev` label
+   - Claude creates a PR automatically
+
+3. **Request changes via comment:**
+   ```
+   @claude Please add validation for email format
+   ```
+
+### Features
+
+- **Issue-to-PR Automation:** Label issues with `claude-dev` for automatic implementation
+- **Cloud Testing:** Tests run on Node.js 18/20 with Docker
+- **Code Review:** DDD/Clean Architecture compliance checks
+- **Architecture Validation:** Layer dependency verification
+
+See [docs/claude-code-github-actions.md](./docs/claude-code-github-actions.md) for full documentation.
 
 ---
 

@@ -1,0 +1,234 @@
+name: Claude Code - Code Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+jobs:
+  claude-review:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.draft == false
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v44
+        with:
+          files: |
+            src/**/*.ts
+            tests/**/*.ts
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Claude Code Review
+        if: steps.changed-files.outputs.any_changed == 'true'
+        uses: anthropics/claude-code-action@beta
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: |
+            You are reviewing a PR for a DDD/Clean Architecture TypeScript project.
+
+            ## Review Guidelines
+
+            ### DDD/Clean Architecture Compliance
+            Check for:
+            - Domain layer has NO imports from outer layers
+            - Entities have behavior (not anemic)
+            - Value Objects are immutable
+            - Domain Events use past-tense naming
+            - Repository interfaces in domain, implementations in infrastructure
+            - Use Cases orchestrate, don't contain business logic
+
+            ### Code Quality
+            Check for:
+            - TypeScript strict mode compliance
+            - Proper error handling
+            - No code duplication
+            - Consistent naming conventions
+            - Security vulnerabilities (OWASP Top 10)
+
+            ### Testing
+            Check for:
+            - Unit tests for domain logic
+            - Integration tests for use cases
+            - Adequate test coverage
+
+            ## Changed Files
+            ${{ steps.changed-files.outputs.all_changed_files }}
+
+            ## Instructions
+            1. Read each changed file
+            2. Check against the guidelines above
+            3. Run architecture validation: npm run validate:layers
+            4. Provide specific, actionable feedback
+            5. Rate the PR: APPROVE, REQUEST_CHANGES, or COMMENT
+
+            Output format:
+            ```
+            ## Code Review Summary
+
+            ### Overall Assessment
+            [APPROVE/REQUEST_CHANGES/COMMENT]
+
+            ### DDD Compliance
+            - [Findings]
+
+            ### Code Quality
+            - [Findings]
+
+            ### Security
+            - [Findings]
+
+            ### Specific Comments
+            - [File:Line] [Comment]
+
+            ### Recommendations
+            - [List]
+            ```
+          allowed_tools: |
+            Read
+            Glob
+            Grep
+            Bash
+          max_turns: 30
+          timeout_minutes: 15
+
+      - name: Post review comment
+        if: steps.changed-files.outputs.any_changed == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // Get the diff for context
+            const { data: files } = await github.rest.pulls.listFiles({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number
+            });
+
+            const changedFiles = files.map(f => `- ${f.filename} (+${f.additions}/-${f.deletions})`).join('\n');
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: `## 🤖 Claude Code Review
+
+            ### Files Reviewed
+            ${changedFiles}
+
+            ### Review Checklist
+
+            #### DDD/Clean Architecture
+            - [ ] Domain layer has no outer layer imports
+            - [ ] Entities contain business logic
+            - [ ] Value Objects are immutable
+            - [ ] Domain Events use past-tense naming
+            - [ ] Repository pattern followed correctly
+
+            #### Code Quality
+            - [ ] TypeScript strict mode compliant
+            - [ ] Proper error handling
+            - [ ] No code duplication
+            - [ ] Consistent naming
+
+            #### Testing
+            - [ ] Unit tests for domain logic
+            - [ ] Integration tests for use cases
+
+            ---
+            *Automated review by Claude Code. Please review the specific comments above.*`
+            });
+
+      - name: Skip review message
+        if: steps.changed-files.outputs.any_changed != 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: `ℹ️ No TypeScript source files changed in this PR. Skipping Claude Code review.`
+            });
+
+  architecture-validation:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate layer dependencies
+        id: validate
+        run: |
+          npm run validate:layers 2>&1 | tee validation-output.txt
+          echo "exit_code=${PIPESTATUS[0]}" >> $GITHUB_OUTPUT
+
+      - name: Post validation results
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const output = fs.readFileSync('validation-output.txt', 'utf8');
+            const passed = '${{ steps.validate.outputs.exit_code }}' === '0';
+
+            const status = passed ? '✅ Passed' : '❌ Failed';
+            const emoji = passed ? '✅' : '❌';
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: `## ${emoji} Architecture Validation
+
+            **Status:** ${status}
+
+            <details>
+            <summary>Validation Output</summary>
+
+            \`\`\`
+            ${output}
+            \`\`\`
+
+            </details>
+
+            ### Layer Dependency Rules
+            - ✅ Domain layer: No outer layer imports
+            - ✅ Application layer: Only Domain imports
+            - ✅ Infrastructure layer: Domain and Application imports allowed
+            - ✅ Interface layer: All layers allowed
+
+            ---
+            🤖 Validated by Claude Code`
+            });
+
+            if (!passed) {
+              core.setFailed('Architecture validation failed');
+            }
