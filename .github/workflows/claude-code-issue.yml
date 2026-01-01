@@ -1,0 +1,166 @@
+name: Claude Code - Issue Development
+
+on:
+  issues:
+    types: [opened, labeled]
+  issue_comment:
+    types: [created]
+
+jobs:
+  claude-develop:
+    # Only run when issue has 'claude-dev' label or comment starts with '@claude'
+    if: |
+      (github.event_name == 'issues' && contains(github.event.issue.labels.*.name, 'claude-dev')) ||
+      (github.event_name == 'issue_comment' && startsWith(github.event.comment.body, '@claude'))
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Get issue details
+        id: issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const comment = context.payload.comment;
+
+            let prompt = '';
+            if (comment && comment.body.startsWith('@claude')) {
+              prompt = comment.body.replace('@claude', '').trim();
+            } else {
+              prompt = `Issue #${issue.number}: ${issue.title}\n\n${issue.body}`;
+            }
+
+            core.setOutput('number', issue.number);
+            core.setOutput('title', issue.title);
+            core.setOutput('prompt', prompt);
+
+      - name: Run Claude Code
+        id: claude
+        uses: anthropics/claude-code-action@beta
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: |
+            You are working on a DDD/Clean Architecture TypeScript project.
+
+            IMPORTANT: Follow the spec-workflow-mcp process:
+            1. First check if a spec exists for this task
+            2. If not, create requirements -> design -> tasks
+            3. Get approval before implementation
+            4. Follow DDD layer order: Domain -> Application -> Infrastructure -> Interface
+
+            Issue to implement:
+            ${{ steps.issue.outputs.prompt }}
+
+            After implementation:
+            - Run tests: npm test
+            - Run lint: npm run lint
+            - Run typecheck: npm run typecheck
+            - Validate architecture: npm run validate:layers
+          allowed_tools: |
+            Read
+            Write
+            Edit
+            Bash
+            Glob
+            Grep
+            Task
+          max_turns: 50
+          timeout_minutes: 30
+
+      - name: Create branch and commit
+        if: success()
+        run: |
+          BRANCH_NAME="claude/issue-${{ steps.issue.outputs.number }}"
+          git config user.name "Claude Code"
+          git config user.email "claude@anthropic.com"
+
+          # Check if there are changes
+          if [[ -n $(git status --porcelain) ]]; then
+            git checkout -b "$BRANCH_NAME"
+            git add -A
+            git commit -m "feat: implement issue #${{ steps.issue.outputs.number }}
+
+            ${{ steps.issue.outputs.title }}
+
+            🤖 Generated with Claude Code GitHub Action
+
+            Co-Authored-By: Claude <noreply@anthropic.com>"
+
+            git push origin "$BRANCH_NAME"
+            echo "BRANCH_CREATED=true" >> $GITHUB_ENV
+            echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
+          else
+            echo "No changes to commit"
+            echo "BRANCH_CREATED=false" >> $GITHUB_ENV
+          fi
+
+      - name: Create Pull Request
+        if: env.BRANCH_CREATED == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: pr } = await github.rest.pulls.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `feat: implement issue #${{ steps.issue.outputs.number }}`,
+              body: `## Summary
+
+            Automated implementation for #${{ steps.issue.outputs.number }}
+
+            ## Changes
+
+            ${{ steps.claude.outputs.summary || 'See commits for details' }}
+
+            ## Checklist
+
+            - [ ] Tests pass
+            - [ ] Lint passes
+            - [ ] Type check passes
+            - [ ] Architecture validation passes
+            - [ ] Code review completed
+
+            ---
+            🤖 Generated with Claude Code GitHub Action
+
+            Closes #${{ steps.issue.outputs.number }}`,
+              head: process.env.BRANCH_NAME,
+              base: 'main'
+            });
+
+            // Add comment to issue
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: ${{ steps.issue.outputs.number }},
+              body: `🤖 Claude Code has created a PR for this issue: #${pr.number}\n\nPlease review the changes.`
+            });
+
+      - name: Comment on failure
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: ${{ steps.issue.outputs.number }},
+              body: `⚠️ Claude Code encountered an issue while implementing this task.\n\nPlease check the [workflow run](${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}) for details.`
+            });
