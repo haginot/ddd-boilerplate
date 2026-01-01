@@ -1,4 +1,5 @@
 {
+  "enableAllProjectMcpServers": true,
   "sandbox": {
     "allowUnsandboxedCommands": false,
     "excludedCommands": ["docker", "docker-compose"],
