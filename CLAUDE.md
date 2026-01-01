@@ -491,6 +491,80 @@ npm run typecheck
 
 ---
 
+## Agent Selection Protocol
+
+### Mandatory Orchestrator Usage
+
+**IMPORTANT:** For ALL development tasks in this DDD/Clean Architecture project,
+you MUST follow this protocol:
+
+#### Automatic Invocation (Preferred)
+The `ddd-orchestrator` should automatically activate when you receive requests containing:
+- Feature implementation keywords
+- Code modifications in `src/` directory
+- Architecture discussions
+- Domain modeling requests
+
+#### Verification Check
+Before implementing ANY code changes, verify:
+```
+Is this a development task?
+  -> YES: Has ddd-orchestrator been invoked?
+    -> NO: Invoke it now before proceeding
+    -> YES: Proceed with implementation
+  -> NO: Handle directly
+```
+
+#### Explicit Invocation (Fallback)
+If automatic invocation doesn't occur for development tasks:
+```
+@ddd-orchestrator [describe the task]
+```
+
+#### Examples
+
+**Correct workflow:**
+```
+User: "Implement User registration feature"
+Claude: [Automatically invokes ddd-orchestrator]
+Orchestrator: [Analyzes -> Delegates to specialists]
+Result: Coordinated multi-agent implementation
+```
+
+**Incorrect workflow (avoid):**
+```
+User: "Implement User registration feature"
+Claude: [Directly starts implementing without orchestrator]
+```
+
+#### Emergency Override
+Only skip orchestrator for:
+- Reading existing files (no modifications)
+- Answering questions about architecture (no implementation)
+- Simple documentation updates (README, comments)
+
+### Subagent Delegation Rules
+
+When you ARE the orchestrator:
+1. **Always decompose** complex tasks by DDD layer
+2. **Delegate, don't implement** - use specialist agents
+3. **Validate compliance** - check layer dependencies
+4. **Integrate results** - coordinate multiple agents
+5. **Report comprehensively** - summarize all work done
+
+### Available Specialist Agents
+
+| Agent | Role | Use For |
+|-------|------|---------|
+| `ddd-orchestrator` | Primary coordinator | All development tasks |
+| `ddd-architect-reviewer` | Architecture guardian | Design reviews, compliance checks |
+| `domain-engineer` | Domain specialist | Aggregates, Entities, Value Objects |
+| `application-engineer` | Application specialist | Use Cases, Commands, Queries |
+| `infrastructure-engineer` | Infrastructure specialist | Repositories, External services |
+| `test-specialist` | Testing specialist | Unit, Integration, E2E tests |
+
+---
+
 ## Code Review Checklist
 
 Before committing code, verify:
