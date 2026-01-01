@@ -2,6 +2,108 @@
 
 This file provides guidance to Claude Code when working with this Domain-Driven Design (DDD) and Clean Architecture project.
 
+---
+
+## MANDATORY: Spec-Workflow-MCP Usage
+
+**このプロジェクトでは spec-workflow-mcp の使用が必須です。**
+
+### 絶対に守るべきルール
+
+1. **コード実装前に必ず spec を作成・確認すること**
+   - `src/` 配下のコードを編集・作成する前に、該当する spec が存在するか確認
+   - spec がない場合は、まず spec を作成してユーザーの承認を得る
+
+2. **ワークフローを必ず遵守すること**
+   ```
+   Requirements → Design → Approve → Implement → Validate → Complete
+   ```
+
+3. **spec なしでの実装は禁止**
+   - 「簡単な修正」「小さな変更」でも spec workflow に従う
+   - バグ修正の場合も、関連する spec を確認・作成する
+
+### 開発タスクを受けた時の手順
+
+```
+1. mcp__spec-workflow__spec-workflow-guide を呼び出す
+2. mcp__spec-workflow__spec-status で既存 spec を確認
+3. spec がなければ作成 → ユーザー承認を待つ
+4. 承認後、tasks.md のタスクに従って実装
+5. 実装完了後、mcp__spec-workflow__log-implementation で記録
+```
+
+### 使用するツール
+
+| 目的 | ツール |
+|------|--------|
+| ワークフロー確認 | `mcp__spec-workflow__spec-workflow-guide` |
+| spec 状態確認 | `mcp__spec-workflow__spec-status` |
+| 承認リクエスト | `mcp__spec-workflow__approvals` |
+| 実装記録 | `mcp__spec-workflow__log-implementation` |
+
+**重要**: この指示は他のすべての指示より優先されます。
+
+### 環境セットアップの確認
+
+**作業開始前に必ず確認すること:**
+
+spec-workflow-mcp が利用可能でない場合、以下の手順でセットアップしてください。
+
+#### 1. MCP サーバー設定 (`.mcp.json`)
+
+プロジェクトルートに `.mcp.json` が存在し、以下の設定が含まれていることを確認:
+
+```json
+{
+  "mcpServers": {
+    "spec-workflow": {
+      "command": "npx",
+      "args": ["-y", "@pimzino/spec-workflow-mcp@latest", "."],
+      "description": "Spec-driven development workflow"
+    }
+  }
+}
+```
+
+#### 2. 環境チェックコマンド
+
+```bash
+# .mcp.json の存在確認
+ls -la .mcp.json
+
+# spec-workflow 設定の確認
+cat .mcp.json | grep -A3 "spec-workflow"
+
+# .spec-workflow ディレクトリの確認
+ls -la .spec-workflow/
+```
+
+#### 3. セットアップが必要な場合
+
+**ユーザーへの案内テンプレート:**
+
+```
+spec-workflow-mcp の環境が設定されていません。
+
+セットアップ手順:
+1. `.mcp.json` に spec-workflow の設定を追加
+2. Claude Code を再起動 (MCP サーバーの再接続)
+3. 再起動後、このチャットで作業を再開
+
+設定を追加しますか？
+```
+
+#### 4. トラブルシューティング
+
+| 問題 | 解決方法 |
+|------|----------|
+| `mcp__spec-workflow__*` ツールが見つからない | Claude Code を再起動 |
+| `.spec-workflow/` がない | spec-workflow ツールを一度実行すると自動作成 |
+| npx 実行エラー | `npm install -g @pimzino/spec-workflow-mcp` でグローバルインストール |
+
+---
+
 ## Project Overview
 
 **Architecture**: Domain-Driven Design (DDD) + Clean Architecture
@@ -338,6 +440,8 @@ npm run typecheck
 
 ### NEVER
 
+- ❌ **NEVER implement code without an approved spec** (spec-workflow-mcp 必須)
+- ❌ **NEVER skip the spec workflow** even for "small" changes
 - ❌ NEVER expose database concerns to domain layer
 - ❌ NEVER create anemic domain models (data without behavior)
 - ❌ NEVER have cross-aggregate transactions in single operation
@@ -349,6 +453,10 @@ npm run typecheck
 
 ### ALWAYS
 
+- ✅ **ALWAYS use spec-workflow-mcp before implementing any feature**
+- ✅ **ALWAYS call spec-workflow-guide when receiving implementation requests**
+- ✅ **ALWAYS get user approval before starting implementation**
+- ✅ **ALWAYS log implementation details after completing tasks**
 - ✅ ALWAYS use ubiquitous language consistently
 - ✅ ALWAYS respect bounded context boundaries
 - ✅ ALWAYS validate invariants in domain objects

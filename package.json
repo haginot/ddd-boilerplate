@@ -24,6 +24,7 @@
     "performance:report": "node scripts/performance-report.js",
     "performance:dashboard": "node scripts/performance-report.js --format html --output dashboard.html && open dashboard.html",
     "spec:dashboard": "npx @pimzino/spec-workflow-mcp@latest --dashboard",
+    "spec:verify": "./scripts/verify-spec-workflow-setup.sh",
     "docker:build": "docker build -f Dockerfile.test -t ddd-boilerplate-test .",
     "docker:test": "docker-compose -f docker-compose.test.yml run --rm test-runner && docker-compose -f docker-compose.test.yml run --rm integration-test",
     "docker:test:unit": "docker-compose -f docker-compose.test.yml run --rm test-runner",

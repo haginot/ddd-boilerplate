@@ -57,3 +57,13 @@ CLAUDE.local.md
 # Performance reports (generated)
 dashboard.html
 performance-report.json
+
+# Spec Workflow (user-specific content)
+.spec-workflow/specs/*
+!.spec-workflow/specs/.gitkeep
+.spec-workflow/approvals/*
+!.spec-workflow/approvals/.gitkeep
+.spec-workflow/archive/*
+!.spec-workflow/archive/.gitkeep
+.spec-workflow/steering/*
+!.spec-workflow/steering/.gitkeep
