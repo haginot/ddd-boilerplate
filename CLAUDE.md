@@ -525,6 +525,74 @@ git commit --no-verify -m "emergency fix"
 
 ---
 
+## Just - Command Runner
+
+This project uses [Just](https://github.com/casey/just) as a command runner for development workflows.
+
+### Installation
+
+```bash
+# macOS
+brew install just
+
+# Linux
+curl --proto '=https' --tlsv1.2 -sSf https://just.systems/install.sh | bash -s -- --to /usr/local/bin
+
+# Or use the setup script
+npm run setup
+```
+
+### Main Workflows
+
+| Command | Description |
+|---------|-------------|
+| `just ci` | Full CI pipeline (format → lint → test → docker → integration) |
+| `just check` | Quick pre-commit check |
+| `just pre-commit` | Pre-commit workflow (used by git hook) |
+
+### Step-by-Step Workflow
+
+```bash
+just format          # 1. Code formatting (Prettier)
+just lint            # 2. ESLint
+just typecheck       # 3. TypeScript type check
+just test-unit       # 4. Unit tests
+just test-docker     # 5. Docker environment tests
+just test-integration # 6. Integration tests
+just gh-actions      # 7. Local GitHub Actions verification
+```
+
+### Docker Commands
+
+```bash
+just docker-build    # Build test image
+just docker-up       # Start test environment
+just docker-down     # Stop test environment
+just test-api        # Run API tests in Docker
+```
+
+### GitHub Actions Local Testing
+
+```bash
+# Run specific workflow
+just gh-actions workflow="claude-code-test.yml"
+
+# List available workflows
+just gh-actions-list
+
+# Dry run (show what would execute)
+just gh-actions-dry
+```
+
+### All Commands
+
+```bash
+just --list          # Show all available recipes
+just help            # Detailed help
+```
+
+---
+
 ## Critical Rules
 
 ### NEVER

@@ -47,5 +47,66 @@ services:
       - ./coverage:/app/coverage
       - ./reports:/app/reports
 
+  # API Test Service - For testing HTTP endpoints
+  api-test:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    depends_on:
+      test-db:
+        condition: service_healthy
+      api:
+        condition: service_started
+    environment:
+      DATABASE_URL: postgres://test:test@test-db:5432/testdb
+      API_BASE_URL: http://api:3000
+      NODE_ENV: test
+    command: ["npm", "run", "test:e2e", "--", "--passWithNoTests"]
+    volumes:
+      - ./src:/app/src
+      - ./tests:/app/tests
+      - ./coverage:/app/coverage
+      - ./reports:/app/reports
+
+  # API Server for E2E testing
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    depends_on:
+      test-db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://test:test@test-db:5432/testdb
+      NODE_ENV: test
+      PORT: 3000
+    command: ["npm", "run", "start"]
+    ports:
+      - "3000:3000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+  # Lint runner for CI
+  lint-runner:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    command: ["npm", "run", "lint"]
+    volumes:
+      - ./src:/app/src
+
+  # TypeCheck runner for CI
+  typecheck-runner:
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    command: ["npm", "run", "typecheck"]
+    volumes:
+      - ./src:/app/src
+
 volumes:
   test-db-data:
