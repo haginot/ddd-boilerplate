@@ -2,8 +2,19 @@
 
 # Pre-commit hook: Run linting, type checking, and architecture validation
 # This ensures code quality before commits reach the repository
+# Uses 'just' if available, falls back to npm scripts
 
 echo "🔍 Running pre-commit checks..."
+
+# Check if 'just' is available
+if command -v just > /dev/null 2>&1; then
+    echo "📋 Using Just for pre-commit workflow..."
+    just pre-commit
+    exit $?
+fi
+
+# Fallback to npm scripts if 'just' is not installed
+echo "📋 Using npm scripts for pre-commit workflow..."
 
 # Run lint-staged (ESLint + Prettier on staged files)
 echo "📝 Checking staged files with lint-staged..."

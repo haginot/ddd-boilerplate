@@ -38,7 +38,14 @@
     "pre-commit": "lint-staged && npm run typecheck && npm run validate:layers",
     "pre-commit:install": "husky install && npx husky add .husky/pre-commit 'npm run pre-commit' && npx husky add .husky/commit-msg 'npx --no -- commitlint --edit ${1}'",
     "format": "prettier --write 'src/**/*.ts'",
-    "format:check": "prettier --check 'src/**/*.ts'"
+    "format:check": "prettier --check 'src/**/*.ts'",
+    "setup": "./scripts/setup-dev-tools.sh",
+    "ci:local": "just ci",
+    "ci:check": "just check",
+    "docker:api-test": "docker-compose -f docker-compose.test.yml run --rm api-test",
+    "docker:lint": "docker-compose -f docker-compose.test.yml run --rm lint-runner",
+    "docker:typecheck": "docker-compose -f docker-compose.test.yml run --rm typecheck-runner",
+    "gh-actions:local": "act --container-architecture linux/amd64"
   },
   "keywords": [
     "ddd",

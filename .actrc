@@ -1,0 +1,17 @@
+# Act configuration for running GitHub Actions locally
+# See: https://github.com/nektos/act
+
+# Use medium-sized runner image (good balance of size and compatibility)
+-P ubuntu-latest=catthehacker/ubuntu:act-latest
+
+# Use large image for better compatibility (uncomment if needed)
+# -P ubuntu-latest=catthehacker/ubuntu:full-latest
+
+# Container architecture for M1/M2 Macs
+--container-architecture linux/amd64
+
+# Reuse containers for faster subsequent runs
+--reuse
+
+# Default artifact server path
+--artifact-server-path /tmp/act-artifacts
