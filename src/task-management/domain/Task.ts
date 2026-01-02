@@ -14,11 +14,11 @@ import { TaskStatusChangedEvent } from './events/TaskStatusChangedEvent.js';
 
 export interface CreateTaskParams {
   title: string;
-  description?: string;
-  projectId?: ProjectId;
-  priority?: PriorityLevel;
-  dueDate?: Date;
-  assignee?: { userId: string; name: string; email: string };
+  description?: string | undefined;
+  projectId?: ProjectId | undefined;
+  priority?: PriorityLevel | undefined;
+  dueDate?: Date | undefined;
+  assignee?: { userId: string; name: string; email: string } | undefined;
   createdBy: string;
 }
 
