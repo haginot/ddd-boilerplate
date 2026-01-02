@@ -455,6 +455,72 @@ npm run lint:fix
 
 # Type check
 npm run typecheck
+
+# Format code
+npm run format
+npm run format:check
+```
+
+---
+
+## Pre-commit Hooks
+
+This project uses **Husky** + **lint-staged** to enforce code quality before commits.
+
+### Automatic Checks on Commit
+
+When you run `git commit`, the following checks are automatically executed:
+
+1. **lint-staged**: ESLint + Prettier on staged files
+2. **TypeScript type check**: `npm run typecheck`
+3. **Architecture validation**: `npm run validate:layers`
+4. **Commit message validation**: Conventional commits format
+
+### Setup (First Time)
+
+Pre-commit hooks are automatically installed when you run `npm install` (via the `prepare` script).
+
+### Manual Setup (if needed)
+
+```bash
+npm run pre-commit:install
+```
+
+### Commit Message Format
+
+Commits must follow [Conventional Commits](https://www.conventionalcommits.org/):
+
+```
+<type>(<scope>): <subject>
+
+[optional body]
+
+[optional footer]
+```
+
+**Types:**
+- `feat`: New feature
+- `fix`: Bug fix
+- `docs`: Documentation
+- `style`: Code style (formatting)
+- `refactor`: Code refactoring
+- `perf`: Performance improvement
+- `test`: Tests
+- `build`: Build system
+- `ci`: CI/CD
+- `chore`: Other changes
+
+**Examples:**
+```bash
+git commit -m "feat: add user authentication"
+git commit -m "fix(api): handle null response"
+git commit -m "docs: update README"
+```
+
+### Skipping Hooks (Emergency Only)
+
+```bash
+git commit --no-verify -m "emergency fix"
 ```
 
 ---

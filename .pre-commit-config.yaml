@@ -1,0 +1,82 @@
+# Pre-commit hooks configuration
+# Install: pip install pre-commit && pre-commit install
+# Run manually: pre-commit run --all-files
+# See: https://pre-commit.com
+
+default_stages: [commit]
+fail_fast: false
+
+repos:
+  # General file checks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+        exclude: ^(dist/|coverage/|node_modules/)
+      - id: end-of-file-fixer
+        exclude: ^(dist/|coverage/|node_modules/)
+      - id: check-yaml
+        args: [--allow-multiple-documents]
+      - id: check-json
+        exclude: ^(package-lock\.json|tsconfig\.json)
+      - id: check-added-large-files
+        args: [--maxkb=1000]
+      - id: check-merge-conflict
+      - id: detect-private-key
+      - id: no-commit-to-branch
+        args: [--branch, main, --branch, master]
+
+  # Secrets detection
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.4.0
+    hooks:
+      - id: detect-secrets
+        args: [--baseline, .secrets.baseline]
+        exclude: ^(package-lock\.json|\.env\.example)
+
+  # Node.js/TypeScript checks via local hooks
+  - repo: local
+    hooks:
+      # ESLint
+      - id: eslint
+        name: ESLint
+        entry: npm run lint
+        language: system
+        types: [typescript]
+        pass_filenames: false
+        stages: [commit]
+
+      # TypeScript type check
+      - id: typecheck
+        name: TypeScript Type Check
+        entry: npm run typecheck
+        language: system
+        types: [typescript]
+        pass_filenames: false
+        stages: [commit]
+
+      # Architecture validation (DDD layer dependencies)
+      - id: validate-architecture
+        name: Validate DDD Architecture
+        entry: npm run validate:layers
+        language: system
+        pass_filenames: false
+        stages: [commit]
+        files: ^src/
+
+      # Unit tests (optional - can be slow)
+      # Uncomment if you want tests to run on every commit
+      # - id: test-unit
+      #   name: Unit Tests
+      #   entry: npm run test:unit -- --passWithNoTests
+      #   language: system
+      #   pass_filenames: false
+      #   stages: [commit]
+
+  # Commit message linting
+  - repo: https://github.com/alessandrojcm/commitlint-pre-commit-hook
+    rev: v9.10.0
+    hooks:
+      - id: commitlint
+        stages: [commit-msg]
+        additional_dependencies: ['@commitlint/config-conventional']
