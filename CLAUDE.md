@@ -633,6 +633,7 @@ This project includes GitHub Actions workflows for automated development with Cl
 | `claude-code-issue.yml` | Issue with `claude-dev` label | Auto-implement issues |
 | `claude-code-test.yml` | PR/push | Cloud testing |
 | `claude-code-review.yml` | PR | Automated code review |
+| `claude-code-auto-fix.yml` | CI failure (workflow_run) | Auto-fix CI failures |
 
 ### Quick Start
 
@@ -651,9 +652,62 @@ This project includes GitHub Actions workflows for automated development with Cl
 ### Features
 
 - **Issue-to-PR Automation:** Label issues with `claude-dev` for automatic implementation
-- **Cloud Testing:** Tests run on Node.js 18/20 with Docker
+- **Cloud Testing:** Tests run on Node.js 20/22 with Docker
 - **Code Review:** DDD/Clean Architecture compliance checks
 - **Architecture Validation:** Layer dependency verification
+- **Auto-Fix CI Failures:** Automatic repair of CI failures using Claude Code
+
+### Auto-Fix Workflow
+
+The `claude-code-auto-fix.yml` workflow automatically fixes CI failures:
+
+1. **Trigger:** When any of the following workflows fail:
+   - Claude Code - Cloud Testing
+   - Docker CI
+   - AI-Generated Code Quality
+   - Task Validation
+
+2. **Process:**
+   - Detects failed jobs and retrieves error logs
+   - Analyzes the failure using Claude Code
+   - Attempts automatic fixes (lint, type errors, tests)
+   - Commits and pushes fixes to the PR branch
+   - Comments on the PR with results
+
+3. **Safety:**
+   - Only runs on PRs (not direct pushes)
+   - Prevents infinite loops by skipping `claude-auto-fix-*` branches
+   - Respects DDD/Clean Architecture rules
+
+### Local CI Monitoring (gh CLI + Claude Code)
+
+For immediate CI monitoring without waiting for workflow_run triggers:
+
+```bash
+# Interactive watch mode - prompts before fixing
+npm run ci:watch
+
+# Auto-fix mode - automatically fixes failures
+npm run ci:watch:auto
+
+# Background monitoring
+npm run ci:monitor
+
+# Manual fix for specific run
+npm run ci:fix -- --run-id <RUN_ID>
+```
+
+**Features:**
+- Real-time CI status dashboard
+- Automatic failure detection
+- Claude Code integration for intelligent fixes
+- Git commit/push automation
+- Works on any branch (no main branch restriction)
+
+**Requirements:**
+- `gh` CLI installed and authenticated
+- Claude Code CLI (`npm install -g @anthropic-ai/claude-code`)
+- `ANTHROPIC_API_KEY` environment variable
 
 See [docs/claude-code-github-actions.md](./docs/claude-code-github-actions.md) for full documentation.
 

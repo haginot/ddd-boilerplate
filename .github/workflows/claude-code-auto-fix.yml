@@ -1,0 +1,245 @@
+name: Claude Code - Auto Fix CI Failures
+
+# CI/テストが失敗したときに自動的にClaude Codeで修正を試みる
+on:
+  workflow_run:
+    workflows:
+      - "Claude Code - Cloud Testing"
+      - "Docker CI"
+      - "AI-Generated Code Quality"
+      - "Task Validation"
+    types:
+      - completed
+
+permissions:
+  contents: write
+  pull-requests: write
+  actions: read
+  checks: read
+
+jobs:
+  auto-fix:
+    # 失敗時のみ実行、かつPRが存在する場合のみ
+    # 無限ループ防止: claude-auto-fix-で始まるブランチは除外
+    if: |
+      github.event.workflow_run.conclusion == 'failure' &&
+      github.event.workflow_run.pull_requests[0] != null &&
+      !startsWith(github.event.workflow_run.head_branch, 'claude-auto-fix-')
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout failed branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_branch }}
+          fetch-depth: 0
+
+      - name: Setup Git
+        run: |
+          git config user.name "claude-code[bot]"
+          git config user.email "claude-code[bot]@users.noreply.github.com"
+
+      - name: Get PR information
+        id: pr-info
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.workflow_run.pull_requests[0];
+            if (pr) {
+              core.setOutput('pr_number', pr.number);
+              core.setOutput('pr_head_ref', context.payload.workflow_run.head_branch);
+            }
+            return pr ? pr.number : null;
+
+      - name: Get failed job logs
+        id: failure-info
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const runId = context.payload.workflow_run.id;
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+
+            // 失敗したジョブを取得
+            const jobs = await github.rest.actions.listJobsForWorkflowRun({
+              owner,
+              repo,
+              run_id: runId,
+            });
+
+            const failedJobs = jobs.data.jobs.filter(job => job.conclusion === 'failure');
+            let failureSummary = `# CI Failure Summary\n\n`;
+            failureSummary += `**Workflow:** ${context.payload.workflow_run.name}\n`;
+            failureSummary += `**Run ID:** ${runId}\n`;
+            failureSummary += `**Branch:** ${context.payload.workflow_run.head_branch}\n\n`;
+
+            for (const job of failedJobs) {
+              failureSummary += `## Failed Job: ${job.name}\n\n`;
+
+              // ジョブのログを取得
+              try {
+                const logs = await github.rest.actions.downloadJobLogsForWorkflowRun({
+                  owner,
+                  repo,
+                  job_id: job.id,
+                });
+
+                // ログの最後の500行を取得（エラー部分）
+                const logLines = logs.data.split('\n');
+                const relevantLogs = logLines.slice(-500).join('\n');
+                failureSummary += `\`\`\`\n${relevantLogs}\n\`\`\`\n\n`;
+              } catch (e) {
+                failureSummary += `(Could not fetch logs: ${e.message})\n\n`;
+              }
+
+              // 失敗したステップを特定
+              const failedSteps = job.steps?.filter(step => step.conclusion === 'failure') || [];
+              if (failedSteps.length > 0) {
+                failureSummary += `### Failed Steps:\n`;
+                for (const step of failedSteps) {
+                  failureSummary += `- ${step.name}\n`;
+                }
+                failureSummary += `\n`;
+              }
+            }
+
+            // 出力をファイルに保存（長いログ対策）
+            const fs = require('fs');
+            fs.writeFileSync('failure-summary.md', failureSummary);
+
+            core.setOutput('failed_workflow', context.payload.workflow_run.name);
+            core.setOutput('run_id', runId);
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Auto-fix with Claude Code
+        uses: anthropics/claude-code-action@beta
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: |
+            CI/CDパイプラインが失敗しました。以下の失敗情報を分析し、問題を修正してください。
+
+            ## 失敗したワークフロー
+            ${{ steps.failure-info.outputs.failed_workflow }}
+
+            ## 失敗の詳細
+            失敗サマリーは `failure-summary.md` ファイルを読んでください。
+
+            ## 修正手順
+
+            1. まず `failure-summary.md` を読んで失敗の原因を特定
+            2. エラーメッセージを分析し、根本原因を特定
+            3. 必要なファイルを読んで問題の箇所を確認
+            4. コードを修正
+
+            ## 重要な注意事項
+
+            - このプロジェクトはDDD（ドメイン駆動設計）とClean Architectureに従っています
+            - `CLAUDE.md` を読んでプロジェクトのルールを確認してください
+            - レイヤー間の依存関係ルールを遵守してください:
+              - Domain層は外部依存なし
+              - Application層はDomainのみ依存可
+              - Infrastructure層はDomainインターフェースを実装
+            - 既存のテストが通るように修正してください
+            - 新しいエラーを導入しないでください
+
+            ## よくある失敗パターンと対処法
+
+            - **ESLint設定なし**: `.eslintrc.js` または `eslint.config.js` を作成
+            - **TypeScript型エラー**: 型定義を修正
+            - **テスト失敗**: テストコードまたは実装を修正
+            - **依存関係エラー**: `package.json` の依存関係を確認
+            - **Node.jsバージョン**: `package.json` の `engines` フィールドを確認
+
+            修正が完了したら、変更内容をコミットしてください。
+          allowed_tools: |
+            Edit
+            MultiEdit
+            Write
+            Read
+            Glob
+            Grep
+            LS
+            Bash(npm:*)
+            Bash(npx:*)
+            Bash(git add:*)
+            Bash(git commit:*)
+            Bash(git status:*)
+            Bash(git diff:*)
+          max_turns: 30
+          timeout_minutes: 15
+
+      - name: Push fixes if changes exist
+        id: push-fixes
+        run: |
+          if [[ -n $(git status --porcelain) ]]; then
+            git add -A
+            git commit -m "fix: auto-fix CI failures from ${{ steps.failure-info.outputs.failed_workflow }}
+
+            Workflow Run: ${{ steps.failure-info.outputs.run_id }}
+
+            🤖 Generated with Claude Code" || true
+
+            git push origin ${{ github.event.workflow_run.head_branch }}
+            echo "changes_pushed=true" >> $GITHUB_OUTPUT
+          else
+            echo "No changes to push"
+            echo "changes_pushed=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Comment on PR
+        if: steps.push-fixes.outputs.changes_pushed == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prNumber = ${{ steps.pr-info.outputs.pr_number }};
+            if (prNumber) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                body: `## 🤖 Claude Code Auto-Fix
+
+            CI失敗を検出し、自動修正を試みました。
+
+            **失敗したワークフロー:** ${{ steps.failure-info.outputs.failed_workflow }}
+            **修正コミット:** このPRに自動的にプッシュされました
+
+            変更内容を確認し、問題がないかレビューしてください。
+
+            ---
+            🤖 Generated with [Claude Code](https://claude.ai/code)`
+              });
+            }
+
+      - name: Comment if no fix applied
+        if: steps.push-fixes.outputs.changes_pushed == 'false'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prNumber = ${{ steps.pr-info.outputs.pr_number }};
+            if (prNumber) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                body: `## 🤖 Claude Code Auto-Fix
+
+            CI失敗を検出しましたが、自動修正できませんでした。
+
+            **失敗したワークフロー:** ${{ steps.failure-info.outputs.failed_workflow }}
+            **Run ID:** ${{ steps.failure-info.outputs.run_id }}
+
+            手動での修正が必要です。ワークフローのログを確認してください。
+
+            ---
+            🤖 Generated with [Claude Code](https://claude.ai/code)`
+              });
+            }
