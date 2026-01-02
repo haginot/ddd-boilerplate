@@ -679,6 +679,36 @@ The `claude-code-auto-fix.yml` workflow automatically fixes CI failures:
    - Prevents infinite loops by skipping `claude-auto-fix-*` branches
    - Respects DDD/Clean Architecture rules
 
+### Local CI Monitoring (gh CLI + Claude Code)
+
+For immediate CI monitoring without waiting for workflow_run triggers:
+
+```bash
+# Interactive watch mode - prompts before fixing
+npm run ci:watch
+
+# Auto-fix mode - automatically fixes failures
+npm run ci:watch:auto
+
+# Background monitoring
+npm run ci:monitor
+
+# Manual fix for specific run
+npm run ci:fix -- --run-id <RUN_ID>
+```
+
+**Features:**
+- Real-time CI status dashboard
+- Automatic failure detection
+- Claude Code integration for intelligent fixes
+- Git commit/push automation
+- Works on any branch (no main branch restriction)
+
+**Requirements:**
+- `gh` CLI installed and authenticated
+- Claude Code CLI (`npm install -g @anthropic-ai/claude-code`)
+- `ANTHROPIC_API_KEY` environment variable
+
 See [docs/claude-code-github-actions.md](./docs/claude-code-github-actions.md) for full documentation.
 
 ---

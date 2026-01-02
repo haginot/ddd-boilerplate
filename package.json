@@ -33,7 +33,11 @@
     "docker:clean": "docker-compose -f docker-compose.test.yml down -v --remove-orphans || true",
     "docker:check": "./scripts/docker-problem-detector.sh",
     "report:latest": "node scripts/view-report.js",
-    "report:history": "ls -1 reports/*.json 2>/dev/null || echo 'no reports'"
+    "report:history": "ls -1 reports/*.json 2>/dev/null || echo 'no reports'",
+    "ci:watch": "./scripts/ci-monitor/watch-and-fix.sh",
+    "ci:watch:auto": "./scripts/ci-monitor/watch-and-fix.sh --auto",
+    "ci:monitor": "./scripts/ci-monitor/monitor.sh",
+    "ci:fix": "./scripts/ci-monitor/auto-fix.sh"
   },
   "keywords": [
     "ddd",
