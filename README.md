@@ -1,33 +1,33 @@
 # DDD Boilerplate
 
-Domain-Driven Design (DDD) と Clean Architecture のボイラープレート。TypeScript/Node.js プロジェクト向けに最適化され、Claude Code との統合により AI 支援開発をサポートします。
+A Domain-Driven Design (DDD) and Clean Architecture boilerplate optimized for TypeScript/Node.js projects, with AI-assisted development support through Claude Code integration.
 
-## 📋 目次
+## 📋 Table of Contents
 
-- [機能概要](#機能概要)
-- [アーキテクチャ](#アーキテクチャ)
-- [クイックスタート](#クイックスタート)
-- [環境構築](#環境構築)
-- [組み込み機能](#組み込み機能)
-- [開発ワークフロー](#開発ワークフロー)
-- [ドキュメント](#ドキュメント)
+- [Features](#features)
+- [Architecture](#architecture)
+- [Quick Start](#quick-start)
+- [Environment Setup](#environment-setup)
+- [Integrated Features](#integrated-features)
+- [Development Workflow](#development-workflow)
+- [Documentation](#documentation)
 
-## 🎯 機能概要
+## 🎯 Features
 
-このボイラープレートには以下の機能が組み込まれています：
+This boilerplate includes the following integrated features:
 
-- **Clean Architecture**: 4層アーキテクチャと明確な依存関係ルール
-- **DDD パターン**: Entity, Value Object, Aggregate Root, Domain Event, Repository
-- **Claude Code 統合**: Subagents, Skills, Hooks による自動化された開発支援
-- **Spec-Workflow**: 承認ベースの仕様駆動開発ワークフロー
-- **Pre-commit Hooks**: Husky + lint-staged + commitlint による自動品質チェック
-- **Just**: コマンドランナーによる統一された開発ワークフロー
-- **Claude Flow**: Swarm、メモリ、アーキテクチャ検証
-- **MCP Servers**: 複数の MCP サーバーによる拡張機能
-- **Docker**: テスト環境と CI/CD 統合
-- **GitHub Actions**: 自動化された CI/CD パイプライン
+- **Clean Architecture**: Four-layer architecture with clear dependency rules
+- **DDD Patterns**: Entity, Value Object, Aggregate Root, Domain Event, Repository
+- **Claude Code Integration**: Automated development assistance through Subagents, Skills, and Hooks
+- **Spec-Workflow**: Approval-based specification-driven development workflow
+- **Pre-commit Hooks**: Automated quality checks with Husky + lint-staged + commitlint
+- **Just**: Unified development workflow through command runner
+- **Claude Flow**: Swarm, memory, and architecture validation
+- **MCP Servers**: Extended functionality through multiple MCP servers
+- **Docker**: Test environment and CI/CD integration
+- **GitHub Actions**: Automated CI/CD pipeline
 
-## 🏗️ アーキテクチャ
+## 🏗️ Architecture
 
 ```
 ┌─────────────────────────────────────┐
@@ -41,219 +41,219 @@ Domain-Driven Design (DDD) と Clean Architecture のボイラープレート。
 └─────────────────────────────────────┘
 ```
 
-### 依存関係ルール
+### Dependency Rule
 
-依存関係は**内側のみ**を指します：
+Dependencies point **inward only**:
 
 - Interface → Application → Domain
 - Infrastructure → Domain (implements interfaces)
-- ❌ Domain は外側のレイヤーから**決して**インポートしない
+- ❌ Domain **NEVER** imports from outer layers
 
-## 🚀 クイックスタート
+## 🚀 Quick Start
 
-### 前提条件
+### Prerequisites
 
 - **Node.js** >= 18.0.0
-- **npm** または **yarn**
+- **npm** or **yarn**
 - **Git**
-- **Claude Code** (推奨、AI 支援開発用)
-- **Docker** (オプション、テスト環境用)
-- **Just** (オプション、コマンドランナー用)
+- **Claude Code** (Recommended, for AI-assisted development)
+- **Docker** (Optional, for test environment)
+- **Just** (Optional, for command runner)
 
-### インストール
+### Installation
 
 ```bash
-# リポジトリをクローン
+# Clone the repository
 git clone <repository-url>
 cd ddd-boilerplate
 
-# 依存関係をインストール
+# Install dependencies
 npm install
 
-# 開発ツールをセットアップ（Just, Act, pre-commit）
+# Setup development tools (Just, Act, pre-commit)
 npm run setup
 
-# プロジェクトをビルド
+# Build the project
 npm run build
 ```
 
-## ⚙️ 環境構築
+## ⚙️ Environment Setup
 
-### 1. 環境変数の設定
+### 1. Environment Variables Configuration
 
-環境変数は2つの方法で設定できます：
+Environment variables can be configured in two ways:
 
-#### 方法1: プロジェクトレベルの設定（.env ファイル）
+#### Method 1: Project-level Configuration (.env file)
 
-プロジェクトルートに `.env` ファイルを作成し、推奨環境変数を設定します：
+Create a `.env` file in the project root and configure recommended environment variables:
 
 ```bash
-# .env.example をコピー
+# Copy .env.example
 cp .env.example .env
 
-# 必要に応じて値を編集
-# 特に CLAUDE_CODE_MAX_OUTPUT_TOKENS は推奨値に設定することを推奨
+# Edit values as needed
+# Especially recommended to set CLAUDE_CODE_MAX_OUTPUT_TOKENS to recommended value
 ```
 
-**Node.js アプリケーションで環境変数を使用する場合**:
+**For Node.js Applications Using Environment Variables**:
 
-アプリケーションコードで環境変数を使用する場合は、`dotenv` パッケージをインストールして使用してください：
+If you want to use environment variables in your application code, install and use the `dotenv` package:
 
 ```bash
-# dotenv をインストール
+# Install dotenv
 npm install dotenv
 
-# アプリケーションのエントリーポイントで読み込み
+# Load in application entry point
 # src/index.ts
 import 'dotenv/config';
-// または
+// or
 import dotenv from 'dotenv';
 dotenv.config();
 ```
 
-#### 方法2: シェルレベルの設定（推奨）
+#### Method 2: Shell-level Configuration (Recommended)
 
-Claude Code の動作を最適化するために、シェル設定ファイルに環境変数を追加することを推奨します：
+For optimal Claude Code performance, it's recommended to add environment variables to your shell configuration file:
 
-**`~/.zshrc` または `~/.bashrc` に追加:**
+**Add to `~/.zshrc` or `~/.bashrc`:**
 
 ```bash
-# Claude Code 出力トークン制限の引き上げ
-# デフォルト: 4096 → 長い応答でエラーが発生する場合に増加
+# Increase Claude Code output token limit
+# Default: 4096 → Increase if errors occur with long responses
 export CLAUDE_CODE_MAX_OUTPUT_TOKENS=16384
 ```
 
-**設定後の反映:**
+**Apply changes:**
 
 ```bash
-source ~/.zshrc  # または source ~/.bashrc
+source ~/.zshrc  # or source ~/.bashrc
 ```
 
-**推奨環境変数** (`.env.example` を参照):
+**Recommended Environment Variables** (see `.env.example`):
 
-| 環境変数                        | デフォルト値 | 推奨値                                     | 説明                                             | 設定方法                              |
-| ------------------------------- | ------------ | ------------------------------------------ | ------------------------------------------------ | ------------------------------------- |
-| `CLAUDE_CODE_MAX_OUTPUT_TOKENS` | 4096         | 16384                                      | 出力トークンの最大数。長い応答が必要な場合に増加 | シェル設定ファイル（推奨）または .env |
-| `NODE_ENV`                      | -            | development                                | Node.js 環境                                     | .env                                  |
-| `DATABASE_URL`                  | -            | postgres://test:test@localhost:5432/testdb | テストデータベース接続URL                        | .env                                  |
-| `PORT`                          | -            | 3000                                       | API サーバーポート                               | .env                                  |
-| `API_BASE_URL`                  | -            | http://localhost:3000                      | API ベースURL                                    | .env                                  |
+| Environment Variable            | Default Value | Recommended Value                          | Description                                          | Configuration Method                    |
+| ------------------------------- | ------------- | ------------------------------------------ | ---------------------------------------------------- | --------------------------------------- |
+| `CLAUDE_CODE_MAX_OUTPUT_TOKENS` | 4096          | 16384                                      | Maximum output tokens. Increase for longer responses | Shell config file (recommended) or .env |
+| `NODE_ENV`                      | -             | development                                | Node.js environment                                  | .env                                    |
+| `DATABASE_URL`                  | -             | postgres://test:test@localhost:5432/testdb | Test database connection URL                         | .env                                    |
+| `PORT`                          | -             | 3000                                       | API server port                                      | .env                                    |
+| `API_BASE_URL`                  | -             | http://localhost:3000                      | API base URL                                         | .env                                    |
 
-**注意**:
+**Note**:
 
-- `CLAUDE_CODE_MAX_OUTPUT_TOKENS` は Claude Code が使用するため、シェル設定ファイルに設定することを推奨します
-- トークン数を増やすと、API コストが増加する可能性があります
-- `.env` ファイルは `.gitignore` に含まれているため、Git にコミットされません
+- `CLAUDE_CODE_MAX_OUTPUT_TOKENS` is used by Claude Code, so it's recommended to set it in the shell configuration file
+- Increasing token count may increase API costs
+- `.env` file is included in `.gitignore`, so it won't be committed to Git
 
-### 2. Claude Code の設定
+### 2. Claude Code Configuration
 
-#### MCP サーバーの確認
+#### MCP Server Verification
 
-`.mcp.json` に以下の MCP サーバーが設定されていることを確認：
+Verify that the following MCP servers are configured in `.mcp.json`:
 
-- `memory`: 永続的なメモリストレージ
-- `filesystem`: ファイルシステムアクセス
-- `sequential-thinking`: 段階的な推論
-- `claude-flow`: Claude Flow MCP サーバー
-- `spec-workflow`: 仕様駆動開発ワークフロー
+- `memory`: Persistent memory storage
+- `filesystem`: File system access
+- `sequential-thinking`: Step-by-step reasoning
+- `claude-flow`: Claude Flow MCP server
+- `spec-workflow`: Specification-driven development workflow
 
-#### Claude Code の再起動
+#### Restart Claude Code
 
-環境変数を設定した後、**Claude Code を再起動**して MCP サーバーを再接続してください。
+After setting environment variables, **restart Claude Code** to reconnect MCP servers.
 
-### 3. Git Hooks のセットアップ
+### 3. Git Hooks Setup
 
-Pre-commit hooks は `npm install` 時に自動的にインストールされます（`prepare` スクリプト経由）。
+Pre-commit hooks are automatically installed when running `npm install` (via the `prepare` script).
 
-手動でセットアップする場合：
+To set up manually:
 
 ```bash
 npm run pre-commit:install
 ```
 
-### 4. 開発ツールのセットアップ
+### 4. Development Tools Setup
 
 ```bash
-# Just, Act, pre-commit をインストール
+# Install Just, Act, pre-commit
 npm run setup
 ```
 
-## 🔧 組み込み機能
+## 🔧 Integrated Features
 
-### 1. Subagents (サブエージェント)
+### 1. Subagents
 
-Claude Code の Subagents 機能により、専門的なエージェントが自動的に呼び出されます。
+Claude Code's Subagents feature automatically invokes specialized agents.
 
-#### 利用可能なエージェント
+#### Available Agents
 
-| エージェント              | 役割                       | 用途                                |
-| ------------------------- | -------------------------- | ----------------------------------- |
-| `ddd-orchestrator`        | 主要コーディネーター       | すべての開発タスク                  |
-| `ddd-architect-reviewer`  | アーキテクチャガーディアン | 設計レビュー、準拠チェック          |
-| `domain-engineer`         | ドメイン専門家             | Aggregates, Entities, Value Objects |
-| `application-engineer`    | アプリケーション専門家     | Use Cases, Commands, Queries        |
-| `infrastructure-engineer` | インフラ専門家             | Repositories, 外部サービス          |
-| `test-specialist`         | テスト専門家               | Unit, Integration, E2E テスト       |
+| Agent                     | Role                      | Use For                             |
+| ------------------------- | ------------------------- | ----------------------------------- |
+| `ddd-orchestrator`        | Primary Coordinator       | All development tasks               |
+| `ddd-architect-reviewer`  | Architecture Guardian     | Design reviews, compliance checks   |
+| `domain-engineer`         | Domain Specialist         | Aggregates, Entities, Value Objects |
+| `application-engineer`    | Application Specialist    | Use Cases, Commands, Queries        |
+| `infrastructure-engineer` | Infrastructure Specialist | Repositories, External Services     |
+| `test-specialist`         | Testing Specialist        | Unit, Integration, E2E Tests        |
 
-#### 自動呼び出し
+#### Automatic Invocation
 
-`ddd-orchestrator` は以下の場合に自動的に呼び出されます：
+`ddd-orchestrator` is automatically invoked when:
 
-- 機能実装のリクエスト
-- `src/` ディレクトリのコード変更
-- アーキテクチャの議論
-- ドメインモデリングのリクエスト
+- Feature implementation requests
+- Code changes in `src/` directory
+- Architecture discussions
+- Domain modeling requests
 
-詳細は `CLAUDE.md` の「Agent Selection Protocol」セクションを参照してください。
+See the "Agent Selection Protocol" section in `CLAUDE.md` for details.
 
-### 2. Spec-Workflow (仕様駆動開発)
+### 2. Spec-Workflow (Specification-Driven Development)
 
-[spec-workflow-mcp](https://github.com/Pimzino/spec-workflow-mcp) を使用した構造化された承認ベースの仕様ワークフロー。
+Structured approval-based specification workflow using [spec-workflow-mcp](https://github.com/Pimzino/spec-workflow-mcp).
 
-#### ワークフロー
+#### Workflow
 
 ```
 Requirements → Design → Approve → Implement → Validate → Complete
 ```
 
-#### クイックスタート
+#### Quick Start
 
 ```bash
-# ダッシュボードを起動（オプション）
+# Start dashboard (optional)
 npm run spec:dashboard
 
-# Claude Code で自然言語を使用：
+# Use natural language in Claude Code:
 # - "Create a spec for user authentication feature"
 # - "List all specs"
 # - "Execute task 1.2 in spec user-auth"
 ```
 
-#### 重要なルール
+#### Important Rules
 
-**このプロジェクトでは spec-workflow-mcp の使用が必須です。**
+**The use of spec-workflow-mcp is mandatory in this project.**
 
-- ✅ コード実装前に必ず spec を作成・確認すること
-- ✅ spec なしでの実装は禁止
-- ✅ ワークフローを必ず遵守すること
+- ✅ Always create and verify specs before code implementation
+- ✅ Implementation without specs is prohibited
+- ✅ Always follow the workflow
 
-詳細は `CLAUDE.md` の「MANDATORY: Spec-Workflow-MCP Usage」セクションを参照してください。
+See the "MANDATORY: Spec-Workflow-MCP Usage" section in `CLAUDE.md` for details.
 
 ### 3. Pre-commit Hooks
 
-**Husky** + **lint-staged** + **commitlint** による自動品質チェック。
+Automated quality checks with **Husky** + **lint-staged** + **commitlint**.
 
-#### コミット時の自動チェック
+#### Automatic Checks on Commit
 
-`git commit` を実行すると、以下のチェックが自動的に実行されます：
+When you run `git commit`, the following checks are automatically executed:
 
-1. **lint-staged**: ESLint + Prettier をステージされたファイルに実行
-2. **TypeScript 型チェック**: `npm run typecheck`
-3. **アーキテクチャ検証**: `npm run validate:layers`
-4. **コミットメッセージ検証**: Conventional Commits 形式
+1. **lint-staged**: Runs ESLint + Prettier on staged files
+2. **TypeScript Type Check**: `npm run typecheck`
+3. **Architecture Validation**: `npm run validate:layers`
+4. **Commit Message Validation**: Conventional Commits format
 
-#### コミットメッセージ形式
+#### Commit Message Format
 
-コミットメッセージは [Conventional Commits](https://www.conventionalcommits.org/) に従う必要があります：
+Commit messages must follow [Conventional Commits](https://www.conventionalcommits.org/):
 
 ```
 <type>(<scope>): <subject>
@@ -263,7 +263,7 @@ npm run spec:dashboard
 [optional footer]
 ```
 
-**例**:
+**Examples**:
 
 ```bash
 git commit -m "feat: add user authentication"
@@ -271,11 +271,11 @@ git commit -m "fix(api): handle null response"
 git commit -m "docs: update README"
 ```
 
-### 4. Just - コマンドランナー
+### 4. Just - Command Runner
 
-[Just](https://github.com/casey/just) を使用した統一された開発ワークフロー。
+Unified development workflow using [Just](https://github.com/casey/just).
 
-#### インストール
+#### Installation
 
 ```bash
 # macOS
@@ -284,192 +284,192 @@ brew install just
 # Linux
 curl --proto '=https' --tlsv1.2 -sSf https://just.systems/install.sh | bash -s -- --to /usr/local/bin
 
-# またはセットアップスクリプトを使用
+# Or use setup script
 npm run setup
 ```
 
-#### 主要ワークフロー
+#### Main Workflows
 
-| コマンド          | 説明                                                                  |
-| ----------------- | --------------------------------------------------------------------- |
-| `just ci`         | 完全な CI パイプライン（format → lint → test → docker → integration） |
-| `just check`      | クイックな pre-commit チェック                                        |
-| `just pre-commit` | Pre-commit ワークフロー（git hook で使用）                            |
+| Command           | Description                                                    |
+| ----------------- | -------------------------------------------------------------- |
+| `just ci`         | Full CI pipeline (format → lint → test → docker → integration) |
+| `just check`      | Quick pre-commit check                                         |
+| `just pre-commit` | Pre-commit workflow (used by git hook)                         |
 
-#### ステップバイステップワークフロー
+#### Step-by-Step Workflow
 
 ```bash
-just format          # 1. コードフォーマット (Prettier)
+just format          # 1. Code formatting (Prettier)
 just lint            # 2. ESLint
-just typecheck       # 3. TypeScript 型チェック
-just test-unit       # 4. ユニットテスト
-just test-docker     # 5. Docker 環境テスト
-just test-integration # 6. 統合テスト
-just gh-actions      # 7. ローカル GitHub Actions 検証
+just typecheck       # 3. TypeScript type check
+just test-unit       # 4. Unit tests
+just test-docker     # 5. Docker environment tests
+just test-integration # 6. Integration tests
+just gh-actions      # 7. Local GitHub Actions verification
 ```
 
-#### すべてのコマンド
+#### All Commands
 
 ```bash
-just --list          # 利用可能なすべてのレシピを表示
-just help            # 詳細なヘルプを表示
+just --list          # Show all available recipes
+just help            # Show detailed help
 ```
 
-詳細は `justfile` を参照してください。
+See `justfile` for details.
 
 ### 5. Claude Flow
 
-Claude Flow による Swarm、メモリ、アーキテクチャ検証機能。
+Swarm, memory, and architecture validation features through Claude Flow.
 
-#### メモリ命名空間
+#### Memory Namespaces
 
-- `domain`: エンティティ、VO、集約、ドメインイベント
-- `application`: ユースケース、コマンド、クエリ
-- `infrastructure`: リポジトリ実装、マッパー、外部サービス
-- `interface`: コントローラ、DTO、API
-- `architecture`: レイヤー決定、パターン適用履歴
-- `specs`: Spec ワークフロー情報
+- `domain`: Entities, VOs, Aggregates, Domain Events
+- `application`: Use Cases, Commands, Queries
+- `infrastructure`: Repository implementations, Mappers, External Services
+- `interface`: Controllers, DTOs, APIs
+- `architecture`: Layer decisions, Pattern application history
+- `specs`: Spec workflow information
 
-#### 設定ファイル
+#### Configuration File
 
-詳細な設定は `.flowconfig.json` を参照してください。
+See `.flowconfig.json` for detailed configuration.
 
-詳細は `FLOW.md` を参照してください。
+See `FLOW.md` for details.
 
 ### 6. MCP Servers
 
-以下の MCP サーバーが設定されています：
+The following MCP servers are configured:
 
-- **memory**: 永続的なメモリストレージ（ドメインコンテキストとユビキタス言語）
-- **filesystem**: プロジェクト管理のためのファイルシステムアクセス
-- **sequential-thinking**: 複雑なアーキテクチャ決定のための段階的推論
-- **claude-flow**: Swarm、メモリ、アーキテクチャ検証のための Claude Flow MCP サーバー
-- **spec-workflow**: DDD/Clean Architecture プロジェクト向けの承認プロセス付き仕様駆動開発ワークフロー
+- **memory**: Persistent memory storage (domain context and ubiquitous language)
+- **filesystem**: File system access for project management
+- **sequential-thinking**: Step-by-step reasoning for complex architectural decisions
+- **claude-flow**: Claude Flow MCP server for swarm, memory, and architecture validation
+- **spec-workflow**: Approval-process specification-driven development workflow for DDD/Clean Architecture projects
 
-設定は `.mcp.json` を参照してください。
+See `.mcp.json` for configuration.
 
 ### 7. Hooks
 
-Claude Code の Hooks による自動検証。
+Automatic validation through Claude Code Hooks.
 
 #### PreToolUse Hooks
 
-コードを書き込む前に実行：
+Executed before writing code:
 
-- **レイヤー依存関係の検証**: ドメインレイヤーが外側のレイヤーをインポートしていないかチェック
-- **命名規則の検証**: 一貫した命名パターンを確保
-- **Orchestrator チェック**: 開発タスクで orchestrator が必要かチェック
+- **Layer Dependency Validation**: Checks that domain layer doesn't import outer layers
+- **Naming Convention Validation**: Ensures consistent naming patterns
+- **Orchestrator Check**: Checks if orchestrator is needed for development tasks
 
 #### PostToolUse Hooks
 
-コードを書き込んだ後に実行：
+Executed after writing code:
 
-- **ドメインイベントの検証**: イベントの命名と構造を検証
-- **アーキテクチャ検証**: Claude Flow による厳密なアーキテクチャ検証
+- **Domain Event Validation**: Validates event naming and structure
+- **Architecture Validation**: Strict architecture validation through Claude Flow
 
-設定は `.claude/settings.json` を参照してください。
+See `.claude/settings.json` for configuration.
 
 ### 8. Docker
 
-テスト環境と CI/CD 統合。
+Test environment and CI/CD integration.
 
-#### テスト用イメージ
+#### Test Images
 
-- `Dockerfile.test`: テスト用 Docker イメージ
-- `docker-compose.test.yml`: テスト環境の Compose 設定
+- `Dockerfile.test`: Docker image for testing
+- `docker-compose.test.yml`: Compose configuration for test environment
 
-#### 主要コマンド
+#### Main Commands
 
 ```bash
-# テストイメージをビルド
+# Build test image
 npm run docker:build
 
-# ユニット+統合テストを Docker で実行
+# Run unit + integration tests in Docker
 npm run docker:test
 
-# 問題検出とレポート生成
+# Detect issues and generate reports
 npm run docker:check
 
-# ユニットテストのみ（高速）
+# Unit tests only (fast)
 npm run docker:test:unit
 ```
 
-#### レポート
+#### Reports
 
-`reports/*.json` にレポートが生成されます（`scripts/docker-problem-detector.sh` が生成）。
+Reports are generated in `reports/*.json` (generated by `scripts/docker-problem-detector.sh`).
 
 ### 9. GitHub Actions
 
-自動化された CI/CD パイプライン。
+Automated CI/CD pipeline.
 
-#### 利用可能なワークフロー
+#### Available Workflows
 
-| ワークフロー             | トリガー                    | 目的               |
-| ------------------------ | --------------------------- | ------------------ |
-| `claude-code-issue.yml`  | `claude-dev` ラベルの Issue | 自動実装           |
-| `claude-code-test.yml`   | PR/push                     | クラウドテスト     |
-| `claude-code-review.yml` | PR                          | 自動コードレビュー |
-| `docker-ci.yml`          | PR/push                     | Docker テスト      |
-| `task-validation.yml`    | PR                          | タスク検証         |
+| Workflow                 | Trigger                       | Purpose             |
+| ------------------------ | ----------------------------- | ------------------- |
+| `claude-code-issue.yml`  | Issue with `claude-dev` label | Auto-implementation |
+| `claude-code-test.yml`   | PR/push                       | Cloud testing       |
+| `claude-code-review.yml` | PR                            | Auto code review    |
+| `docker-ci.yml`          | PR/push                       | Docker tests        |
+| `task-validation.yml`    | PR                            | Task validation     |
 
-#### ローカルでの GitHub Actions テスト
+#### Local GitHub Actions Testing
 
 ```bash
-# 特定のワークフローを実行
+# Run specific workflow
 just gh-actions workflow="claude-code-test.yml"
 
-# 利用可能なワークフローをリスト
+# List available workflows
 just gh-actions-list
 
-# ドライラン（実行内容を表示）
+# Dry run (show what would execute)
 just gh-actions-dry
 ```
 
-詳細は `docs/claude-code-github-actions.md` を参照してください。
+See `docs/claude-code-github-actions.md` for details.
 
-## 💻 開発ワークフロー
+## 💻 Development Workflow
 
-### 1. 新機能の実装
+### 1. Implementing New Features
 
 ```bash
-# 1. Spec を作成（必須）
-# Claude Code で: "Create a spec for [feature name]"
+# 1. Create spec (required)
+# In Claude Code: "Create a spec for [feature name]"
 
-# 2. Spec を承認
-# Claude Code で: "Approve spec [name]"
+# 2. Approve spec
+# In Claude Code: "Approve spec [name]"
 
-# 3. 実装を開始（Orchestrator が自動的に呼び出される）
-# Claude Code で: "Implement task 1.1 in spec [name]"
+# 3. Start implementation (Orchestrator automatically invoked)
+# In Claude Code: "Implement task 1.1 in spec [name]"
 
-# 4. アーキテクチャを検証
+# 4. Validate architecture
 npm run validate:layers
 
-# 5. テストを実行
+# 5. Run tests
 npm test
 
-# 6. コミット（pre-commit hooks が自動実行）
+# 6. Commit (pre-commit hooks automatically executed)
 git commit -m "feat: implement [feature name]"
 ```
 
-### 2. コード品質チェック
+### 2. Code Quality Checks
 
 ```bash
-# クイックチェック（pre-commit 相当）
+# Quick check (pre-commit equivalent)
 just check
 
-# 完全な CI パイプライン
+# Full CI pipeline
 just ci
 
-# 個別チェック
-just format          # コードフォーマット
+# Individual checks
+just format          # Code formatting
 just lint            # ESLint
-just typecheck       # TypeScript 型チェック
-just test-unit       # ユニットテスト
+just typecheck       # TypeScript type check
+just test-unit       # Unit tests
 ```
 
-### 3. 新しい Bounded Context の作成
+### 3. Creating a New Bounded Context
 
-1. コンテキストディレクトリ構造を作成：
+1. Create context directory structure:
 
 ```bash
 mkdir -p src/[context]/{domain,application,infrastructure,interface}
@@ -478,204 +478,204 @@ mkdir -p src/[context]/application/{commands,queries,handlers}
 mkdir -p src/[context]/infrastructure/mappers
 ```
 
-2. ドメインモデルを定義：
-   - `domain/` にエンティティと値オブジェクトを作成
-   - `domain/` にリポジトリインターフェースを定義
-   - `domain/events/` にドメインイベントを作成
+2. Define domain model:
+   - Create entities and value objects in `domain/`
+   - Define repository interfaces in `domain/`
+   - Create domain events in `domain/events/`
 
-3. `application/` にユースケースを実装：
-   - コマンドとクエリを作成
-   - ハンドラーを実装
+3. Implement use cases in `application/`:
+   - Create commands and queries
+   - Implement handlers
 
-4. `infrastructure/` にインフラを追加：
-   - リポジトリを実装
-   - ドメイン ↔ 永続化のマッパーを追加
+4. Add infrastructure in `infrastructure/`:
+   - Implement repositories
+   - Add mappers for domain ↔ persistence conversion
 
-5. `interface/` に API エンドポイントを作成
+5. Create API endpoints in `interface/`
 
-詳細は `CLAUDE.md` を参照してください。
+See `CLAUDE.md` for details.
 
-## 📚 ドキュメント
+## 📚 Documentation
 
-- [CLAUDE.md](./CLAUDE.md) - プロジェクトコンテキストとコーディングガイドライン
-- [FLOW.md](./FLOW.md) - Claude Flow ガイド
-- [docs/ubiquitous-language.md](./docs/ubiquitous-language.md) - ドメイン語彙
-- [docs/context-map.md](./docs/context-map.md) - Bounded Context の関係
-- [docs/claude-code-github-actions.md](./docs/claude-code-github-actions.md) - GitHub Actions 統合
-- [docs/claude-flow-setup.md](./docs/claude-flow-setup.md) - Claude Flow セットアップ
-- [docs/memory-namespaces.md](./docs/memory-namespaces.md) - メモリ命名空間
+- [CLAUDE.md](./CLAUDE.md) - Project context and coding guidelines
+- [FLOW.md](./FLOW.md) - Claude Flow guide
+- [docs/ubiquitous-language.md](./docs/ubiquitous-language.md) - Domain vocabulary
+- [docs/context-map.md](./docs/context-map.md) - Bounded Context relationships
+- [docs/claude-code-github-actions.md](./docs/claude-code-github-actions.md) - GitHub Actions integration
+- [docs/claude-flow-setup.md](./docs/claude-flow-setup.md) - Claude Flow setup
+- [docs/memory-namespaces.md](./docs/memory-namespaces.md) - Memory namespaces
 
-## 🔍 トラブルシューティング
+## 🔍 Troubleshooting
 
-### MCP サーバーが見つからない
+### MCP Server Not Found
 
-1. `.mcp.json` の存在を確認
-2. Claude Code を再起動（MCP サーバーの再接続）
-3. `npm run spec:verify` で spec-workflow の設定を確認
+1. Verify `.mcp.json` exists
+2. Restart Claude Code (reconnect MCP servers)
+3. Verify spec-workflow configuration with `npm run spec:verify`
 
-### Pre-commit hooks が動作しない
+### Pre-commit Hooks Not Working
 
 ```bash
-# Git hooks を再インストール
+# Reinstall Git hooks
 npm run pre-commit:install
 
-# 手動で実行してテスト
+# Test manually
 npm run pre-commit
 ```
 
-### Docker テストが失敗する
+### Docker Tests Failing
 
 ```bash
-# Docker の問題を検出
+# Detect Docker issues
 npm run docker:check
 
-# Docker 環境をクリーンアップ
+# Clean up Docker environment
 npm run docker:clean
 
-# 再ビルド
+# Rebuild
 npm run docker:build
 ```
 
-### Just コマンドが見つからない
+### Just Command Not Found
 
 ```bash
-# Just をインストール
+# Install Just
 npm run setup
 
-# または手動でインストール
+# Or install manually
 brew install just  # macOS
 ```
 
-### 環境変数が読み込まれない
+### Environment Variables Not Loading
 
-1. `.env` ファイルがプロジェクトルートに存在することを確認
-2. Claude Code を再起動
-3. シェルで環境変数を確認: `echo $CLAUDE_CODE_MAX_OUTPUT_TOKENS`
+1. Verify `.env` file exists in project root
+2. Restart Claude Code
+3. Check environment variable in shell: `echo $CLAUDE_CODE_MAX_OUTPUT_TOKENS`
 
-## 📝 ベストプラクティス
+## 📝 Best Practices
 
 ### Domain Layer
 
-- ✅ エンティティと値オブジェクトにドメインロジックを保持
-- ✅ オブジェクト作成にファクトリーメソッドを使用
-- ✅ ドメインオブジェクトで不変条件を検証
-- ✅ 状態変更でドメインイベントを発行
-- ❌ インフラストラクチャやアプリケーションレイヤーからインポートしない
+- ✅ Keep domain logic in entities and value objects
+- ✅ Use factory methods for object creation
+- ✅ Validate invariants in domain objects
+- ✅ Publish domain events for state changes
+- ❌ Never import from infrastructure or application layers
 
 ### Application Layer
 
-- ✅ クラスごとに1つのユースケース
-- ✅ ドメインオブジェクトをオーケストレート、ビジネスロジックは実装しない
-- ✅ 入出力に DTO を使用
-- ✅ イベントパブリッシャーを通じてドメインイベントを発行
+- ✅ One use case per class
+- ✅ Orchestrate domain objects, don't implement business logic
+- ✅ Use DTOs for input/output
+- ✅ Publish domain events through event publisher
 
 ### Infrastructure Layer
 
-- ✅ ドメインレイヤーのリポジトリインターフェースを実装
-- ✅ ドメイン ↔ 永続化の変換にマッパーを使用
-- ✅ ドメインオブジェクトを返す、データベースモデルは返さない
+- ✅ Implement repository interfaces from domain layer
+- ✅ Use mappers for domain ↔ persistence conversion
+- ✅ Return domain objects, never database models
 
-詳細は `CLAUDE.md` の「Best Practices」セクションを参照してください。
+See the "Best Practices" section in `CLAUDE.md` for details.
 
-## 🤖 Claude による初期環境構築
+## 🤖 Initial Environment Setup with Claude
 
-Claude Code を使用してこのプロジェクトを開始する際は、以下の手順に従ってください。
+When starting this project with Claude Code, follow these steps:
 
-### 自動環境構築手順
+### Automated Environment Setup
 
-Claude Code に以下の指示をすることで、環境構築を自動化できます：
+You can automate environment setup by instructing Claude Code as follows:
 
 ```
-このプロジェクトの初期環境構築を実行してください。
-以下の手順に従って、すべての設定を完了させてください：
+Please execute the initial environment setup for this project.
+Follow these steps to complete all configurations:
 
-1. 依存関係のインストール
-   - npm install を実行
-   - 依存関係のインストールが完了したことを確認
+1. Install dependencies
+   - Run npm install
+   - Verify that dependencies are installed
 
-2. 環境変数の設定
-   - .env.example が存在することを確認
-   - .env ファイルが存在しない場合は、.env.example をコピーして作成
-   - CLAUDE_CODE_MAX_OUTPUT_TOKENS が 16384 に設定されていることを確認
+2. Configure environment variables
+   - Verify .env.example exists
+   - If .env file doesn't exist, copy .env.example to create it
+   - Verify CLAUDE_CODE_MAX_OUTPUT_TOKENS is set to 16384
 
-3. 開発ツールのセットアップ
-   - npm run setup を実行して Just, Act, pre-commit をインストール
-   - インストールが完了したことを確認
+3. Setup development tools
+   - Run npm run setup to install Just, Act, pre-commit
+   - Verify installation is complete
 
-4. Git Hooks のセットアップ
-   - npm run pre-commit:install を実行
-   - .husky/pre-commit と .husky/commit-msg が存在することを確認
+4. Setup Git Hooks
+   - Run npm run pre-commit:install
+   - Verify .husky/pre-commit and .husky/commit-msg exist
 
-5. MCP サーバーの確認
-   - .mcp.json が存在し、以下のサーバーが設定されていることを確認：
+5. Verify MCP Servers
+   - Verify .mcp.json exists and the following servers are configured:
      * memory
      * filesystem
      * sequential-thinking
      * claude-flow
      * spec-workflow
 
-6. プロジェクトのビルド
-   - npm run build を実行
-   - ビルドが成功したことを確認
+6. Build the project
+   - Run npm run build
+   - Verify build succeeds
 
-7. アーキテクチャ検証
-   - npm run validate:layers を実行
-   - 検証が成功したことを確認
+7. Validate architecture
+   - Run npm run validate:layers
+   - Verify validation succeeds
 
-8. セットアップ完了の確認
-   - すべての手順が完了したことを報告
-   - 次のステップ（spec の作成など）について案内
+8. Confirm setup completion
+   - Report that all steps are complete
+   - Guide on next steps (e.g., creating specs)
 ```
 
-### 手動環境構築
+### Manual Environment Setup
 
-自動環境構築を使用しない場合は、以下のコマンドを順番に実行してください：
+If not using automated setup, execute the following commands in order:
 
 ```bash
-# 1. 依存関係のインストール
+# 1. Install dependencies
 npm install
 
-# 2. 環境変数の設定
+# 2. Configure environment variables
 cp .env.example .env
-# .env ファイルを編集して必要に応じて値を変更
+# Edit .env file and change values as needed
 
-# 3. 開発ツールのセットアップ
+# 3. Setup development tools
 npm run setup
 
-# 4. Git Hooks のセットアップ（自動的にインストールされますが、確認）
+# 4. Setup Git Hooks (automatically installed, but verify)
 npm run pre-commit:install
 
-# 5. プロジェクトのビルド
+# 5. Build the project
 npm run build
 
-# 6. アーキテクチャ検証
+# 6. Validate architecture
 npm run validate:layers
 
-# 7. Claude Code を再起動（MCP サーバーを再接続）
-# Claude Code を再起動してください
+# 7. Restart Claude Code (reconnect MCP servers)
+# Please restart Claude Code
 ```
 
-### 環境構築後の確認事項
+### Post-Setup Verification
 
-環境構築が完了したら、以下を確認してください：
+After environment setup is complete, verify the following:
 
-- [ ] `.env` ファイルが存在し、推奨環境変数が設定されている
-- [ ] `node_modules` がインストールされている
-- [ ] `.husky/pre-commit` と `.husky/commit-msg` が存在する
-- [ ] `just --version` で Just がインストールされていることを確認
-- [ ] `npm run spec:verify` で spec-workflow の設定が正しいことを確認
-- [ ] Claude Code を再起動して MCP サーバーが接続されていることを確認
+- [ ] `.env` file exists with recommended environment variables configured
+- [ ] `node_modules` is installed
+- [ ] `.husky/pre-commit` and `.husky/commit-msg` exist
+- [ ] Verify Just is installed with `just --version`
+- [ ] Verify spec-workflow configuration is correct with `npm run spec:verify`
+- [ ] Restart Claude Code and verify MCP servers are connected
 
-### 次のステップ
+### Next Steps
 
-環境構築が完了したら、以下のステップに進んでください：
+After environment setup is complete, proceed with the following steps:
 
-1. **Spec の作成**: Claude Code で "Create a spec for [feature name]" と指示して、最初の spec を作成
-2. **Bounded Context の作成**: 新しい Bounded Context を作成してドメインモデルを定義
-3. **開発の開始**: spec-workflow に従って実装を開始
+1. **Create Spec**: Instruct Claude Code with "Create a spec for [feature name]" to create the first spec
+2. **Create Bounded Context**: Create a new Bounded Context and define domain model
+3. **Start Development**: Begin implementation following spec-workflow
 
-詳細は「開発ワークフロー」セクションを参照してください。
+See the "Development Workflow" section for details.
 
-## 📄 ライセンス
+## 📄 License
 
 MIT
